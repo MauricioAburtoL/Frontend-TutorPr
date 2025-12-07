@@ -1,0 +1,44 @@
+# ── Node / Angular
+node_modules/
+dist/
+.angular/
+.angular/cache/
+coverage/
+
+# SSR (builds/output de server)
+.tmp/
+.temp/
+.out/
+output/
+*.log
+
+# IDE / OS
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.iml
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Herramientas
+.yarn/*
+.pnp.*
+.npmrc.local
+.eslintcache
+.stylelintcache
+
+# Env locales (si los usas para secretos de runtime)
+.env
+.env.*
+!.env.example
+
+# Historiales / herramientas varias
+.history/
+.vscode-counter/
