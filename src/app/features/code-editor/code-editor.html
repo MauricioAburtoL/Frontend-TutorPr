@@ -1,0 +1,23 @@
+<div class="panel-header">
+  <span class="panel-title">Editor de Código (Python)</span>
+  <div class="toolbar">
+    <button class="btn btn-secondary" (click)="emitHint()" title="Obtener ayuda">
+      <span class="icon">💡</span> Pista
+    </button>
+    <button class="btn btn-secondary" (click)="emitCFG()" title="Generar diagrama">
+      <span class="icon">🔀</span> CFG
+    </button>
+    <button class="btn btn-primary" (click)="emitRun()">
+      <span class="icon">▶</span> Ejecutar
+    </button>
+  </div>
+</div>
+
+<div class="editor-wrapper">
+  <textarea
+    [value]="code"
+    (input)="onInput($event)"
+    placeholder="Escribe tu código aquí..."
+    spellcheck="false">
+  </textarea>
+</div>

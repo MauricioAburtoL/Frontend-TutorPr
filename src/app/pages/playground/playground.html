@@ -1,0 +1,30 @@
+<div class="main-layout">
+  <header class="app-header">
+    <h1>Edu Assistant <span class="badge">Beta</span></h1>
+  </header>
+
+  <div class="workspace">
+    <!-- Panel izquierdo -->
+    <section class="panel editor-panel">
+      <app-code-editor
+        [code]="code"
+        (codeChange)="onCodeChange($event)"
+        (run)="onRun()"
+        (hint)="onHint()"
+        (cfg)="onCFG()">
+      </app-code-editor>
+
+      <app-output-console [execOut]="execOut"></app-output-console>
+      <app-hint-panel [hint]="hint"></app-hint-panel>
+    </section>
+
+    <!-- Panel derecho -->
+    <section class="panel visualization-panel">
+      <div class="panel-header">
+        <span class="panel-title">Diagrama de Flujo (CFG)</span>
+      </div>
+
+      <app-cfg-viewer [mermaidSrc]="mermaidSrc"></app-cfg-viewer>
+    </section>
+  </div>
+</div>

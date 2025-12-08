@@ -1,0 +1,223 @@
+:host {
+  /* Design Tokens / Paleta de Colores */
+  --primary-color: #3b82f6; /* Azul moderno */
+  --primary-hover: #2563eb;
+  --bg-app: #f3f4f6;
+  --bg-panel: #ffffff;
+  --border-color: #e5e7eb;
+  --text-main: #1f2937;
+  --text-muted: #6b7280;
+  --console-bg: #1e293b; /* Fondo oscuro para consola */
+  --console-text: #10b981; /* Verde terminal */
+  --accent-hint: #fffbeb;
+  --border-hint: #fcd34d;
+  
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--text-main);
+  display: block;
+  height: 100vh;
+  background-color: var(--bg-app);
+  overflow: hidden; /* Evita scroll en toda la página, solo en paneles */
+}
+
+/* Header */
+.app-header {
+  height: 60px;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.app-header h1 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-main);
+}
+
+.badge {
+  background: #e0e7ff;
+  color: #4338ca;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+/* Layout Principal */
+.workspace {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Split 50/50 */
+  gap: 24px;
+  padding: 24px;
+  height: calc(100vh - 60px);
+  box-sizing: border-box;
+}
+
+/* Paneles (Card Style) */
+.panel {
+  background: var(--bg-panel);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Para que el contenido no rompa el radio */
+}
+
+.panel-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+  background: #f9fafb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.panel-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Toolbar y Botones */
+.toolbar {
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background-color: white;
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+}
+.btn-secondary:hover {
+  background-color: #f3f4f6;
+}
+
+/* Editor Area */
+.editor-wrapper {
+  flex: 1; /* Ocupa el espacio disponible */
+  position: relative;
+  min-height: 200px;
+}
+
+textarea {
+  width: 100%;
+  height: 100%;
+  border: none;
+  padding: 16px;
+  font-family: 'Fira Code', 'Consolas', monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  resize: none; /* Quitamos el resize manual */
+  outline: none;
+  box-sizing: border-box;
+  color: #333;
+}
+
+textarea:focus {
+  background-color: #fafafa;
+}
+
+/* Console Output */
+.console-area {
+  background: var(--console-bg);
+  padding: 12px;
+  border-top: 1px solid var(--border-color);
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.console-label {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.console-output {
+  margin: 0;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.85rem;
+  color: var(--console-text);
+  white-space: pre-wrap;
+}
+
+/* Hints */
+.hint-box {
+  background-color: var(--accent-hint);
+  border-top: 1px solid var(--border-hint);
+  padding: 12px 16px;
+  font-size: 0.9rem;
+  color: #92400e;
+  animation: slideUp 0.3s ease-out;
+}
+
+/* Diagram Container */
+.diagram-container {
+  flex: 1;
+  padding: 16px;
+  overflow: auto; /* Permite scroll si el diagrama es grande */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+  background-size: 20px 20px; /* Efecto papel milimetrado sutil */
+}
+
+#diagram {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* Animaciones */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive para pantallas pequeñas */
+@media (max-width: 768px) {
+  .workspace {
+    grid-template-columns: 1fr;
+    height: auto;
+    overflow-y: auto;
+  }
+  .panel {
+    min-height: 400px;
+  }
+  :host {
+    height: auto;
+    overflow: auto;
+  }
+}
