@@ -11,7 +11,6 @@ export interface ExecOut {
   stderr?: string;
   error_type?: string | null;
   runtime_ms?: number | null;
-  // lo que más devuelva tu backend...
 }
 
 export interface HintOut {
@@ -20,27 +19,54 @@ export interface HintOut {
   concept?: string;
 }
 
-export interface CfgOut {
-  mermaid: string;
-  // nodes/edges si los envías
+export interface CfgOut { mermaid: string; }
+
+// 👉 tip opcional para no repetir
+export interface ExecInPayload {
+  user_id: string;
+  session_id: string;
+  exercise_id: string;
+  attempt_id: string;
+  code: string;
+  lang: Lang;
 }
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   constructor(private http: HttpClient) {}
 
-  // Si tu backend necesita también el lenguaje para ejecutar,
-  // cambia la firma a execute(code: string, lang: Lang)
-  execute(code: string): Observable<ExecOut> {
-    return this.http.post<ExecOut>('/api/execute', { code });
+  // Helper para generar IDs de prueba
+  private attemptId() { return Date.now().toString(); }
+
+  // ⚠️ Enviar TODO lo que tu backend espera (ExecuteIn)
+  run(code: string, lang: Lang): Observable<ExecOut> {
+    const body: ExecInPayload = {
+      user_id:    'demo-user',
+      session_id: 'local-session',
+      exercise_id:'ex-1',
+      attempt_id: this.attemptId(),
+      code,
+      lang
+    };
+    return this.http.post<ExecOut>('/api/execute', body);
   }
 
-  // Si tu backend espera lang en el hint, añade lang aquí y en el body
-  hint(code: string, exec_result: any /*, lang?: Lang */): Observable<HintOut> {
-    return this.http.post<HintOut>('/api/hint', { code, exec_result /*, lang */ });
+  // ⚠️ Enviar TODO lo que tu backend espera (HintIn)
+  hint(code: string, exec_result: any, lang: Lang): Observable<HintOut> {
+    const body = {
+      user_id:    'demo-user',
+      session_id: 'local-session',
+      exercise_id:'ex-1',
+      attempt_id: this.attemptId(),
+      code,
+      exec_result,
+      lang
+    };
+    return this.http.post<HintOut>('/api/hint', body);
   }
 
+  // ✅ ya lo corregiste: usamos /api/cfg/{lang}
   cfg(lang: Lang, code: string): Observable<CfgOut> {
-    return this.http.post<CfgOut>(`/api/ast/cfg/${lang}`, { code });
+    return this.http.post<CfgOut>(`/api/cfg/${lang}`, { code });
   }
 }

@@ -70,7 +70,8 @@
               "buildTarget": "Frontend-TutorPr:build:production"
             },
             "development": {
-              "buildTarget": "Frontend-TutorPr:build:development"
+              "buildTarget": "Frontend-TutorPr:build:development",
+              "proxyConfig": "src/proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"
