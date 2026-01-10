@@ -1,0 +1,50 @@
+<div class="profile-container" *ngIf="stats">
+  
+  <header class="header-nav">
+    <a routerLink="/home" class="back-link">← Volver al Inicio</a>
+  </header>
+
+  <div class="profile-header">
+    <div class="avatar-circle">👤</div>
+    <div class="user-info">
+      <h1>{{ stats.username }}</h1>
+      <span class="badge">{{ stats.level }}</span>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="icon">✅</div>
+      <h3>{{ stats.exercisesCompleted }}</h3>
+      <p>Ejercicios Resueltos</p>
+    </div>
+    
+    <div class="kpi-card">
+      <div class="icon">🔥</div>
+      <h3>{{ stats.studyStreak }} Días</h3>
+      <p>Racha de Estudio</p>
+    </div>
+
+    <div class="kpi-card">
+      <div class="icon">⏱️</div>
+      <h3>{{ stats.totalHours }}h</h3>
+      <p>Tiempo Practicado</p>
+    </div>
+  </div>
+
+  <div class="skills-section">
+    <h2>Mis Habilidades</h2>
+    <div class="skills-list">
+      <div class="skill-item" *ngFor="let skill of stats.skills">
+        <div class="skill-info">
+          <span>{{ skill.name }}</span>
+          <span>{{ skill.progress }}%</span>
+        </div>
+        <div class="progress-bg">
+          <div class="progress-fill" [style.width.%]="skill.progress"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

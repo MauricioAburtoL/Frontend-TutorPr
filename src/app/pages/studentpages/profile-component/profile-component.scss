@@ -1,0 +1,92 @@
+.profile-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.back-link {
+  text-decoration: none;
+  color: #636e72;
+  font-weight: bold;
+  display: inline-block;
+  margin-bottom: 2rem;
+  &:hover { color: #0984e3; }
+}
+
+/* Identidad */
+.profile-header {
+  display: flex;
+  align-items: center;
+  background: white;
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  margin-bottom: 2rem;
+
+  .avatar-circle {
+    width: 80px; height: 80px;
+    background: #dfe6e9;
+    border-radius: 50%;
+    font-size: 2.5rem;
+    display: flex; align-items: center; justify-content: center;
+    margin-right: 1.5rem;
+  }
+
+  .user-info {
+    h1 { margin: 0 0 5px 0; color: #2d3436; }
+    .badge {
+      background: #e17055;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+  }
+}
+
+/* Grid de KPIs */
+.kpi-grid {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+
+  .kpi-card {
+    flex: 1;
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    min-width: 150px;
+
+    .icon { font-size: 2rem; margin-bottom: 0.5rem; }
+    h3 { margin: 0; font-size: 1.8rem; color: #2c3e50; }
+    p { margin: 5px 0 0; color: #95a5a6; font-size: 0.9rem; }
+  }
+}
+
+/* Skills */
+.skills-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+
+  h2 { margin-top: 0; color: #2d3436; font-size: 1.2rem; margin-bottom: 1.5rem; }
+}
+
+.skill-item {
+  margin-bottom: 1.2rem;
+  
+  .skill-info {
+    display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem; color: #636e72;
+  }
+  
+  .progress-bg {
+    height: 10px; background: #f1f2f6; border-radius: 5px; overflow: hidden;
+    .progress-fill { height: 100%; background: #0984e3; border-radius: 5px; transition: width 1s ease-out; }
+  }
+}

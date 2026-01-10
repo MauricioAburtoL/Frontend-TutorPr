@@ -1,30 +1,66 @@
 <div class="main-layout">
+  
   <header class="app-header">
-    <h1>Edu Assistant <span class="badge">Beta</span></h1>
-  </header>
+    <div class="brand">
+      <h1>Edu Assistant <span class="badge-beta">Beta</span></h1>
+    </div>
+    </header>
+
+  <section class="problem-context" *ngIf="currentExercise">
+    <div class="problem-header">
+      <h2>
+        <span class="icon">📝</span> {{ currentExercise.title }}
+        <span class="difficulty-badge" 
+              [class.easy]="currentExercise.difficulty === 'Fácil'"
+              [class.medium]="currentExercise.difficulty === 'Medio'"
+              [class.hard]="currentExercise.difficulty === 'Difícil'">
+          {{ currentExercise.difficulty }}
+        </span>
+      </h2>
+      <p>{{ currentExercise.description }}</p>
+    </div>
+  </section>
 
   <div class="workspace">
-    <!-- Panel izquierdo -->
+    
     <section class="panel editor-panel">
-      <app-code-editor
-        [code]="code"
-        (codeChange)="onCodeChange($event)"
-        (run)="onRun()"
-        (hint)="onHint()"
-        (cfg)="onCFG()">
-      </app-code-editor>
+      <div class="panel-toolbar">
+        <span class="panel-label">Editor de Código (Python)</span>
+        <div class="actions">
+          <button class="btn btn-sm btn-ghost" (click)="onHint()">💡 Pista</button>
+          <button class="btn btn-sm btn-secondary" (click)="onCFG()">🔀 Ver Diagrama</button>
+          <button class="btn btn-sm btn-primary" (click)="onRun()">▶ Ejecutar</button>
+        </div>
+      </div>
 
-      <app-output-console [execOut]="execOut"></app-output-console>
-      <app-hint-panel [hint]="hint"></app-hint-panel>
+      <div class="editor-container">
+        <app-code-editor
+          [code]="code"
+          (codeChange)="onCodeChange($event)">
+        </app-code-editor>
+      </div>
+
+      <div class="console-wrapper">
+        <app-output-console [execOut]="execOut"></app-output-console>
+      </div>
+      
+      <app-hint-panel [hint]="hint" *ngIf="hint"></app-hint-panel>
     </section>
 
-    <!-- Panel derecho -->
     <section class="panel visualization-panel">
       <div class="panel-header">
         <span class="panel-title">Diagrama de Flujo (CFG)</span>
+        <small class="text-muted">Visualiza la lógica de tu código</small>
       </div>
 
-      <app-cfg-viewer [mermaidSrc]="mermaidSrc"></app-cfg-viewer>
+      <div class="diagram-canvas">
+        <div *ngIf="!mermaidSrc" class="empty-state-diagram">
+          <span>🔀</span>
+          <p>Presiona "Ver Diagrama" para generar la visualización.</p>
+        </div>
+        <app-cfg-viewer [mermaidSrc]="mermaidSrc" *ngIf="mermaidSrc"></app-cfg-viewer>
+      </div>
     </section>
+
   </div>
 </div>

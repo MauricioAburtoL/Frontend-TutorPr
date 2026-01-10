@@ -1,223 +1,158 @@
 :host {
-  /* Design Tokens / Paleta de Colores */
-  --primary-color: #3b82f6; /* Azul moderno */
-  --primary-hover: #2563eb;
-  --bg-app: #f3f4f6;
+  /* Variables de color (Design Tokens) */
+  --primary: #3b82f6;
+  --primary-dark: #2563eb;
+  --bg-app: #f8fafc; /* Fondo general más claro */
   --bg-panel: #ffffff;
-  --border-color: #e5e7eb;
-  --text-main: #1f2937;
-  --text-muted: #6b7280;
-  --console-bg: #1e293b; /* Fondo oscuro para consola */
-  --console-text: #10b981; /* Verde terminal */
-  --accent-hint: #fffbeb;
-  --border-hint: #fcd34d;
+  --border: #e2e8f0;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
   
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  color: var(--text-main);
   display: block;
   height: 100vh;
   background-color: var(--bg-app);
-  overflow: hidden; /* Evita scroll en toda la página, solo en paneles */
-}
-
-/* Header */
-.app-header {
-  height: 60px;
-  background: var(--bg-panel);
-  border-bottom: 1px solid var(--border-color);
-  display: flex;
-  align-items: center;
-  padding: 0 24px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-}
-
-.app-header h1 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin: 0;
+  font-family: 'Inter', system-ui, sans-serif;
   color: var(--text-main);
+  overflow: hidden; /* Importante para el layout fijo */
 }
 
-.badge {
-  background: #e0e7ff;
-  color: #4338ca;
-  font-size: 0.75rem;
-  padding: 2px 8px;
-  border-radius: 12px;
-  margin-left: 8px;
-  vertical-align: middle;
-}
-
-/* Layout Principal */
-.workspace {
-  display: grid;
-  grid-template-columns: 1fr 1fr; /* Split 50/50 */
-  gap: 24px;
-  padding: 24px;
-  height: calc(100vh - 60px);
-  box-sizing: border-box;
-}
-
-/* Paneles (Card Style) */
-.panel {
-  background: var(--bg-panel);
-  border-radius: 12px;
-  border: 1px solid var(--border-color);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+/* LAYOUT PRINCIPAL: Flex vertical */
+.main-layout {
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* Para que el contenido no rompa el radio */
-}
-
-.panel-header {
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--border-color);
-  background: #f9fafb;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.panel-title {
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-/* Toolbar y Botones */
-.toolbar {
-  display: flex;
-  gap: 8px;
-}
-
-.btn {
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.btn-primary {
-  background-color: var(--primary-color);
-  color: white;
-}
-.btn-primary:hover {
-  background-color: var(--primary-hover);
-  transform: translateY(-1px);
-}
-
-.btn-secondary {
-  background-color: white;
-  border: 1px solid var(--border-color);
-  color: var(--text-main);
-}
-.btn-secondary:hover {
-  background-color: #f3f4f6;
-}
-
-/* Editor Area */
-.editor-wrapper {
-  flex: 1; /* Ocupa el espacio disponible */
-  position: relative;
-  min-height: 200px;
-}
-
-textarea {
-  width: 100%;
   height: 100%;
-  border: none;
-  padding: 16px;
-  font-family: 'Fira Code', 'Consolas', monospace;
-  font-size: 14px;
-  line-height: 1.5;
-  resize: none; /* Quitamos el resize manual */
-  outline: none;
-  box-sizing: border-box;
-  color: #333;
 }
 
-textarea:focus {
-  background-color: #fafafa;
-}
-
-/* Console Output */
-.console-area {
-  background: var(--console-bg);
-  padding: 12px;
-  border-top: 1px solid var(--border-color);
-  max-height: 150px;
-  overflow-y: auto;
-}
-
-.console-label {
-  font-size: 0.75rem;
-  color: #64748b;
-  margin-bottom: 4px;
-  font-weight: 600;
-}
-
-.console-output {
-  margin: 0;
-  font-family: 'Fira Code', monospace;
-  font-size: 0.85rem;
-  color: var(--console-text);
-  white-space: pre-wrap;
-}
-
-/* Hints */
-.hint-box {
-  background-color: var(--accent-hint);
-  border-top: 1px solid var(--border-hint);
-  padding: 12px 16px;
-  font-size: 0.9rem;
-  color: #92400e;
-  animation: slideUp 0.3s ease-out;
-}
-
-/* Diagram Container */
-.diagram-container {
-  flex: 1;
-  padding: 16px;
-  overflow: auto; /* Permite scroll si el diagrama es grande */
+/* HEADER GLOBAL */
+.app-header {
+  height: 50px;
+  background: white;
+  border-bottom: 1px solid var(--border);
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
-  background-size: 20px 20px; /* Efecto papel milimetrado sutil */
+  align-items: center;
+  padding: 0 20px;
+  flex-shrink: 0; /* No se encoge */
+  
+  h1 { font-size: 1.1rem; font-weight: 700; margin: 0; color: #0f172a; }
+  .badge-beta { background: #e0e7ff; color: #4338ca; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px; vertical-align: middle; }
 }
 
-#diagram {
-  width: 100%;
+/* SECCIÓN DEL PROBLEMA (Arriba) */
+.problem-context {
+  background: white;
+  border-bottom: 1px solid var(--border);
+  padding: 16px 24px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+
+  h2 {
+    margin: 0 0 4px 0;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  p { margin: 0; color: var(--text-muted); font-size: 0.95rem; max-width: 800px; }
+
+  .difficulty-badge {
+    font-size: 0.75rem; padding: 2px 8px; border-radius: 12px; font-weight: 500; text-transform: uppercase;
+    &.easy { background: #dcfce7; color: #166534; }
+    &.medium { background: #fef9c3; color: #854d0e; }
+    &.hard { background: #fee2e2; color: #991b1b; }
+  }
+}
+
+/* WORKSPACE (Paneles) */
+.workspace {
+  flex: 1; /* Ocupa el resto de la altura */
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 50% - 50% */
+  gap: 16px;
+  padding: 16px;
+  min-height: 0; /* Permite scroll interno */
+}
+
+.panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
-/* Animaciones */
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+/* ESTILOS DEL EDITOR (Izquierda) */
+.editor-panel {
+  .panel-toolbar {
+    padding: 8px 12px;
+    background: #f8fafc;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .panel-label { font-weight: 600; font-size: 0.85rem; color: var(--text-muted); }
+    .actions { display: flex; gap: 8px; }
+  }
+
+  .editor-container {
+    flex: 2; /* El editor ocupa más espacio que la consola */
+    position: relative;
+    min-height: 200px;
+  }
+
+  .console-wrapper {
+    flex: 1;
+    border-top: 4px solid var(--border); /* Separador visual */
+    background: #1e293b;
+    min-height: 120px;
+  }
 }
 
-/* Responsive para pantallas pequeñas */
-@media (max-width: 768px) {
-  .workspace {
-    grid-template-columns: 1fr;
-    height: auto;
-    overflow-y: auto;
+/* ESTILOS DE VISUALIZACIÓN (Derecha) */
+.visualization-panel {
+  .panel-header {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    
+    .panel-title { font-weight: 600; font-size: 0.9rem; color: #334155; }
+    small { font-size: 0.8rem; }
   }
-  .panel {
-    min-height: 400px;
+
+  /* El Lienzo del Diagrama */
+  .diagram-canvas {
+    flex: 1;
+    background-color: #f9fafb;
+    /* Efecto Papel Milimetrado (Puntos) */
+    background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+    background-size: 20px 20px;
+    overflow: auto; /* Scroll si el diagrama es grande */
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    align-items: flex-start;
   }
-  :host {
-    height: auto;
-    overflow: auto;
-  }
+}
+
+/* BOTONES */
+.btn {
+  border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s;
+  
+  &.btn-primary { background: var(--primary); color: white; &:hover { background: var(--primary-dark); } }
+  &.btn-secondary { background: white; border: 1px solid #cbd5e1; color: #334155; &:hover { background: #f1f5f9; } }
+  &.btn-ghost { background: transparent; color: #eab308; &:hover { background: #fefce8; } } /* Para la pista */
+}
+
+/* Empty State */
+.empty-state-diagram {
+  text-align: center;
+  color: var(--text-muted);
+  margin-top: 40px;
+  span { font-size: 2rem; display: block; margin-bottom: 10px; opacity: 0.5; }
 }
