@@ -1,0 +1,33 @@
+<div class="container">
+  <header class="page-header">
+    <a routerLink="/home" class="back-link">← Volver</a>
+    <h1>Temario del Curso</h1>
+    <p>Selecciona un módulo para ver sus ejercicios.</p>
+  </header>
+
+  <div class="topics-grid">
+    
+    <div class="topic-card" *ngFor="let topic of topics">
+      <div class="icon-box">
+        <span>{{ topic.icon }}</span>
+      </div>
+
+      <div class="content">
+        <h3>{{ topic.title }}</h3>
+        <p>{{ topic.description }}</p>
+        
+        <div class="progress-container">
+          <div class="progress-bar" [style.width.%]="topic.progress"></div>
+        </div>
+        <small>{{ topic.progress }}% Completado</small>
+      </div>
+
+      <div class="actions">
+        <button class="btn-primary" [routerLink]="['/topics', topic.id]">
+          Ver Ejercicios
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

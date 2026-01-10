@@ -1,0 +1,84 @@
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.page-header {
+  margin-bottom: 2rem;
+  .back-link { text-decoration: none; color: #636e72; font-weight: bold; font-size: 0.9rem; display: block; margin-bottom: 10px;}
+  h1 { margin: 0; color: #2d3436; }
+  p { margin: 5px 0 0; color: #b2bec3; }
+}
+
+.topics-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.topic-card {
+  display: flex;
+  align-items: center;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+  border: 1px solid #f1f2f6;
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: translateX(5px);
+    border-color: #74b9ff;
+  }
+}
+
+.icon-box {
+  width: 60px; height: 60px;
+  background: #f5f6fa;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.8rem;
+  margin-right: 1.5rem;
+  color: #535c68;
+}
+
+.content {
+  flex: 1;
+  h3 { margin: 0 0 5px 0; color: #2d3436; }
+  p { margin: 0 0 15px 0; color: #636e72; font-size: 0.95rem; }
+}
+
+.progress-container {
+  width: 100%;
+  max-width: 200px;
+  height: 6px;
+  background: #dfe6e9;
+  border-radius: 3px;
+  margin-bottom: 5px;
+  overflow: hidden;
+
+  .progress-bar {
+    height: 100%;
+    background: #00b894; /* Verde éxito */
+    border-radius: 3px;
+  }
+}
+
+small { color: #a4b0be; font-size: 0.8rem; }
+
+.actions {
+  margin-left: 1rem;
+}
+
+.btn-primary {
+  background: #0984e3;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  &:hover { background: #74b9ff; }
+}

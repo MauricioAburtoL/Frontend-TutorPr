@@ -1,26 +1,46 @@
-<div class="main-menu-container">
-  <header class="hero">
-    <h1>Edu Assistant <span class="badge">Beta</span></h1>
-    <p>Plataforma inteligente para el aprendizaje de programación</p>
+<div class="dashboard-container">
+  <header class="welcome-header">
+    <div>
+      <h1>Hola, Estudiante 👋</h1>
+      <p>Continúa tu aprendizaje donde lo dejaste.</p>
+    </div>
+    <div class="user-avatar">
+      <span>👤</span>
+    </div>
   </header>
 
-  <div class="cards-grid">
-    <div class="card disabled">
-      <h3>🧩 Ejercicios Guiados</h3>
-      <p>Resuelve problemas paso a paso con ayuda del tutor.</p>
-      <button disabled>Próximamente</button>
+  <div class="stats-overview">
+    <div class="stat-card">
+      <span class="number">0%</span>
+      <span class="label">Progreso General</span>
+    </div>
+    <div class="stat-card">
+      <span class="number">0</span>
+      <span class="label">Ejercicios Resueltos</span>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="main-actions">
+    
+    <div class="action-card primary" routerLink="/topics">
+      <div class="icon">📚</div>
+      <div class="text">
+        <h3>Ir a los Ejercicios</h3>
+        <p>Explora los temas y comienza a practicar.</p>
+      </div>
+      <div class="arrow">→</div>
     </div>
 
-    <div class="card active">
-      <h3>🚀 Modo Libre (Playground)</h3>
-      <p>Escribe código Python, visualiza el CFG y recibe pistas.</p>
-      <button routerLink="/playground">Entrar al Editor</button>
+    <div class="action-card secondary">
+      <div class="icon">📊</div>
+      <div class="text">
+        <h3>Mi Perfil y Estadísticas</h3>
+        <p>Revisa tu desempeño detallado.</p>
+      </div>
+      <button class="small-btn" disabled>Próximamente</button>
     </div>
 
-    <div class="card disabled">
-      <h3>📈 Mi Progreso</h3>
-      <p>Revisa tus estadísticas y conceptos aprendidos.</p>
-      <button disabled>Próximamente</button>
-    </div>
   </div>
 </div>

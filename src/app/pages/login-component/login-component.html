@@ -1,0 +1,29 @@
+<div class="login-container">
+  <div class="login-card">
+    <h2>Bienvenido a Edu Assistant</h2>
+    <p>Ingresa tus credenciales para continuar</p>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      
+      <div class="form-group">
+        <label>Usuario</label>
+        <input type="text" formControlName="username" placeholder="Ej: alumno">
+      </div>
+
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" formControlName="password" placeholder="***">
+      </div>
+
+      <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+
+      <button type="submit" [disabled]="isLoading || loginForm.invalid">
+        {{ isLoading ? 'Entrando...' : 'Iniciar Sesión' }}
+      </button>
+    </form>
+    
+    <div class="hints">
+      <small>Prueba: <b>alumno / 123</b> o <b>profe / 123</b></small>
+    </div>
+  </div>
+</div>
