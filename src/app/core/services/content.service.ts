@@ -18,6 +18,15 @@ export interface Topic {
   icon: string;
   progress: number;
   totalExercises: number;
+  category: string;      // Ej: 'Fundamentos', 'Lógica', 'Estructuras'
+  tags: string[];        // Ej: ['Variables', 'Strings']
+  estimatedTime: string; // Ej: '2h 30m'
+}
+
+export interface Recommendation {
+  title: string;
+  type: 'review' | 'practice'; // 'review' = leer teoría, 'practice' = ejercicio
+  link: string;
 }
 
 // 1. Agrega estas interfaces al inicio del archivo (junto a Topic y Exercise)
@@ -33,6 +42,18 @@ export interface UserStats {
   studyStreak: number; // Días seguidos
   totalHours: number;
   skills: Skill[];
+  lastAccessed: {
+    exerciseId: string;
+    title: string;
+    topicName: string;
+    progress: number; // Porcentaje de ese ejercicio específico
+  } | null;
+  dailyTip: string;
+  // NUEVOS DATOS PARA EL DIAGNÓSTICO
+  masteryScore: number; // Puntaje global de dominio (0-100)
+  weakAreas: string[]; // Ej: ['Ciclos While', 'Anidación']
+  strongAreas: string[]; // Ej: ['Variables', 'Print']
+  recommendations: Recommendation[];
 }
 
 @Injectable({
@@ -43,21 +64,49 @@ export class ContentService {
   private mockTopics: Topic[] = [
     // ... (Tus temas actuales déjalos igual) ...
     {
-      id: 'intro-python',
-      title: 'Introducción a Python',
-      description: 'Variables, Tipos de Datos y Operadores Básicos.',
-      icon: '🐍',
-      progress: 100,
-      totalExercises: 5
-    },
-    {
-      id: 'control-flujo',
-      title: 'Control de Flujo',
-      description: 'Toma de decisiones con If, Else y Elif.',
-      icon: '🔀',
-      progress: 40,
-      totalExercises: 10
-    },
+    id: 'intro-python',
+    title: 'Introducción a Python',
+    description: 'Domina la sintaxis esencial, variables y operaciones matemáticas.',
+    icon: '🐍',
+    progress: 100,
+    totalExercises: 5,
+    category: 'Fundamentos',
+    tags: ['Variables', 'Tipos de Datos', 'Input/Output'],
+    estimatedTime: '1h 30m'
+  },
+  {
+    id: 'control-flujo',
+    title: 'Control de Flujo',
+    description: 'Aprende a tomar decisiones lógicas en tu código.',
+    icon: '🔀',
+    progress: 40,
+    totalExercises: 10,
+    category: 'Lógica',
+    tags: ['If/Else', 'Booleanos', 'Comparadores'],
+    estimatedTime: '2h 15m'
+  },
+  {
+    id: 'ciclos',
+    title: 'Ciclos y Bucles',
+    description: 'Automatiza tareas repetitivas eficientemente.',
+    icon: '🔁',
+    progress: 0,
+    totalExercises: 8,
+    category: 'Lógica',
+    tags: ['For', 'While', 'Range', 'Iteradores'],
+    estimatedTime: '3h 00m'
+  },
+  {
+    id: 'funciones',
+    title: 'Funciones y Módulos',
+    description: 'Organiza tu código en bloques reutilizables.',
+    icon: '🧩',
+    progress: 0,
+    totalExercises: 6,
+    category: 'Estructuras',
+    tags: ['Def', 'Return', 'Scope', 'Parámetros'],
+    estimatedTime: '4h 00m'
+  }
     // ... resto de temas
   ];
 
@@ -94,23 +143,42 @@ export class ContentService {
   }
 
   // MOCK DATA: Estadísticas del usuario
-  private mockUserStats: UserStats = {
-    username: 'Estudiante',
-    level: 'Explorador de Python 🐍',
-    exercisesCompleted: 12,
-    studyStreak: 3,
-    totalHours: 5.5,
-    skills: [
-      { name: 'Lógica', progress: 75 },
-      { name: 'Sintaxis', progress: 40 },
-      { name: 'Depuración', progress: 20 },
-      { name: 'Algoritmos', progress: 10 }
-    ]
-  };
+private mockUserStats: UserStats = {
+  username: 'Estudiante',
+  level: 'Explorador de Python 🐍',
+  exercisesCompleted: 12,
+  studyStreak: 3,
+  totalHours: 5.5,
+  skills: [
+    { name: 'Lógica', progress: 75 },
+    { name: 'Sintaxis', progress: 40 },
+    { name: 'Depuración', progress: 20 },
+    { name: 'Algoritmos', progress: 10 }
+  ],
+  // NUEVOS DATOS
+  lastAccessed: {
+    exerciseId: 'e3',
+    title: 'Es mayor de edad',
+    topicName: 'Control de Flujo',
+    progress: 50
+  },
+  dailyTip: '💡 Tip: Usa "elif" cuando tengas múltiples condiciones encadenadas para ahorrar líneas de código.',
+
+  // NUEVOS DATOS
+  masteryScore: 45, // Nivel general
+  weakAreas: ['Bucles Anidados', 'Condicionales Compuestos'],
+  strongAreas: ['Declaración de Variables', 'Salida de Datos (Print)'],
+  recommendations: [
+    { title: 'Repasar la teoría de "Ciclos y Bucles"', type: 'review', link: '/topics' },
+    { title: 'Resolver: "El semáforo" (Control de Flujo)', type: 'practice', link: '/solve/e5' }
+  ]
+};
 
   // Método para obtener estos datos
   getUserStats(): Observable<UserStats> {
     return of(this.mockUserStats);
   }
+
+
 
 }

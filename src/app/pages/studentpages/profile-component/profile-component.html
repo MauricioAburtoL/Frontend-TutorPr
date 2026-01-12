@@ -5,35 +5,74 @@
   </header>
 
   <div class="profile-header">
-    <div class="avatar-circle">👤</div>
-    <div class="user-info">
-      <h1>{{ stats.username }}</h1>
-      <span class="badge">{{ stats.level }}</span>
+    <div class="user-main">
+      <div class="avatar-circle">👤</div>
+      <div class="user-info">
+        <h1>{{ stats.username }}</h1>
+        <p class="subtitle">{{ stats.level }}</p>
+      </div>
+    </div>
+    
+    <div class="mastery-badge">
+      <div class="score-circle">
+        <svg viewBox="0 0 36 36" class="circular-chart">
+          <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+          <path class="circle" [attr.stroke-dasharray]="stats.masteryScore + ', 100'" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+        </svg>
+        <span class="score-text">{{ stats.masteryScore }}%</span>
+      </div>
+      <span class="label">Nivel de Dominio</span>
     </div>
   </div>
 
-  <div class="kpi-grid">
-    <div class="kpi-card">
-      <div class="icon">✅</div>
-      <h3>{{ stats.exercisesCompleted }}</h3>
-      <p>Ejercicios Resueltos</p>
-    </div>
+  <div class="diagnostic-grid">
     
-    <div class="kpi-card">
-      <div class="icon">🔥</div>
-      <h3>{{ stats.studyStreak }} Días</h3>
-      <p>Racha de Estudio</p>
+    <div class="diagnostic-card success">
+      <div class="card-title">
+        <span class="icon">🌟</span> 
+        <h3>Tus Fortalezas</h3>
+      </div>
+      <p class="description">Has demostrado dominio en estos temas:</p>
+      <ul>
+        <li *ngFor="let area of stats.strongAreas">✓ {{ area }}</li>
+      </ul>
     </div>
 
-    <div class="kpi-card">
-      <div class="icon">⏱️</div>
-      <h3>{{ stats.totalHours }}h</h3>
-      <p>Tiempo Practicado</p>
+    <div class="diagnostic-card warning">
+      <div class="card-title">
+        <span class="icon">🔧</span> 
+        <h3>Áreas a Reforzar</h3>
+      </div>
+      <p class="description">Detectamos dificultades en:</p>
+      <ul>
+        <li *ngFor="let area of stats.weakAreas">! {{ area }}</li>
+      </ul>
+      <small>El sistema recomienda repasar estos conceptos.</small>
+    </div>
+
+  </div>
+
+  <div class="recommendations-section">
+    <h2>🎯 Tu Plan de Estudio Sugerido</h2>
+    <p class="section-desc">Basado en tus errores recientes, te recomendamos:</p>
+
+    <div class="rec-list">
+      <div class="rec-card" *ngFor="let rec of stats.recommendations">
+        <div class="rec-icon">
+          <span *ngIf="rec.type === 'practice'">💻</span>
+          <span *ngIf="rec.type === 'review'">📖</span>
+        </div>
+        <div class="rec-content">
+          <h4>{{ rec.title }}</h4>
+          <span class="rec-type">{{ rec.type === 'practice' ? 'Ejercicio Práctico' : 'Lectura Recomendada' }}</span>
+        </div>
+        <button class="btn-go" [routerLink]="rec.link">Ir →</button>
+      </div>
     </div>
   </div>
 
   <div class="skills-section">
-    <h2>Mis Habilidades</h2>
+    <h3>Desglose Técnico</h3>
     <div class="skills-list">
       <div class="skill-item" *ngFor="let skill of stats.skills">
         <div class="skill-info">

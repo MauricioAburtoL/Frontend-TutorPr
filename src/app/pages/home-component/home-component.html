@@ -1,46 +1,100 @@
-<div class="dashboard-container">
-  <header class="welcome-header">
-    <div>
-      <h1>Hola, Estudiante 👋</h1>
+<div class="dashboard-wrapper" *ngIf="userStats">
+  
+  <header class="dash-header">
+    <div class="welcome-text">
+      <h1>Hola, {{ userStats.username }} 👋</h1>
       <p>Continúa tu aprendizaje donde lo dejaste.</p>
     </div>
-    <div class="user-avatar" routerLink="/profile">
-      <span>👤</span>
+    
+    <div class="streak-badge">
+      <span class="fire-icon">🔥</span>
+      <div class="streak-info">
+        <span class="count">{{ userStats.studyStreak }} Días</span>
+        <span class="label">Racha seguida</span>
+      </div>
     </div>
   </header>
 
-  <div class="stats-overview">
-    <div class="stat-card">
-      <span class="number">0%</span>
-      <span class="label">Progreso General</span>
-    </div>
-    <div class="stat-card">
-      <span class="number">0</span>
-      <span class="label">Ejercicios Resueltos</span>
-    </div>
-  </div>
-
-  <hr class="divider">
-
-  <div class="main-actions">
+  <div class="dash-grid">
     
-    <div class="action-card primary" routerLink="/topics">
-      <div class="icon">📚</div>
-      <div class="text">
-        <h3>Ir a los Ejercicios</h3>
-        <p>Explora los temas y comienza a practicar.</p>
+    <section class="main-column">
+      
+      <div class="card resume-card" *ngIf="userStats.lastAccessed">
+        <div class="card-content">
+          <span class="tag">En curso</span>
+          <h2>Problema: {{ userStats.lastAccessed.title }}</h2>
+          <p class="topic-ref">Tema: {{ userStats.lastAccessed.topicName }}</p>
+          
+          <div class="progress-mini">
+            <div class="bar" [style.width.%]="userStats.lastAccessed.progress"></div>
+          </div>
+        </div>
+        
+        <button class="btn-play" [routerLink]="['/solve', userStats.lastAccessed.exerciseId]">
+          ▶
+        </button>
       </div>
-      <div class="arrow">→</div>
-    </div>
 
-    <div class="action-card secondary-active" routerLink="/profile">
-      <div class="icon">📊</div>
-      <div class="text">
-        <h3>Mi Perfil y Estadísticas</h3>
-        <p>Revisa tu desempeño detallado.</p>
+      <div class="quick-actions">
+        <div class="action-card" routerLink="/topics">
+          <div class="icon-bg">📚</div>
+          <div class="action-text">
+            <h3>Temario</h3>
+            <p>Ver todos los módulos</p>
+          </div>
+          <span class="arrow">→</span>
+        </div>
+
+        <div class="action-card" routerLink="/playground">
+          <div class="icon-bg">🧪</div>
+          <div class="action-text">
+            <h3>Playground</h3>
+            <p>Modo libre</p>
+          </div>
+          <span class="arrow">→</span>
+        </div>
       </div>
-      <div class="arrow">→</div>
-    </div>
+    </section>
 
+    <section class="side-column">
+      
+      <div class="card stats-card">
+        <div class="card-header">
+          <h3>Mis Habilidades</h3>
+          <a routerLink="/profile" class="link-small">Ver perfil</a>
+        </div>
+        
+        <div class="skills-mini-list">
+          <div class="skill-row" *ngFor="let skill of userStats.skills | slice:0:3">
+            <span class="skill-name">{{ skill.name }}</span>
+            <div class="skill-track">
+              <div class="skill-fill" [style.width.%]="skill.progress"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="kpi-row">
+          <div class="kpi">
+            <strong>{{ userStats.exercisesCompleted }}</strong>
+            <small>Resueltos</small>
+          </div>
+          <div class="vertical-line"></div>
+          <div class="kpi">
+            <strong>{{ userStats.totalHours }}h</strong>
+            <small>Práctica</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="card tip-card">
+        <span class="tip-icon">💡</span>
+        <p>{{ userStats.dailyTip }}</p>
+      </div>
+
+    </section>
   </div>
+</div>
+
+<div *ngIf="!userStats" class="loading-state">
+  <p>Cargando tu perfil...</p>
 </div>

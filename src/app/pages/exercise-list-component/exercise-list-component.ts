@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { ContentService, Exercise, Topic } from '../../core/services/content.service'; // Ajusta la ruta
+import { ContentService, Exercise, Topic } from '../../core/services/content.service';
 
 @Component({
   selector: 'app-exercise-list',
@@ -20,17 +20,16 @@ export class ExerciseListComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // 1. Obtenemos el ID del tema desde la URL (ej: 'control-flujo')
     this.route.paramMap.subscribe(params => {
       const topicId = params.get('topicId');
       
       if (topicId) {
-        // 2. Cargamos la info del tema (para el título)
+        // Obtenemos info del tema
         this.contentService.getTopicById(topicId).subscribe(topic => {
             this.currentTopic = topic;
         });
 
-        // 3. Cargamos los ejercicios de ese tema
+        // Obtenemos los ejercicios
         this.contentService.getExercisesByTopic(topicId).subscribe(data => {
           this.exercises = data;
         });

@@ -1,34 +1,77 @@
-<div class="container">
-  <header class="page-header">
-    <a routerLink="/topics" class="back-link">← Volver a Temas</a>
-    <h1>{{ currentTopic?.title || 'Ejercicios' }}</h1>
-    <p>{{ currentTopic?.description }}</p>
+<div class="container" *ngIf="currentTopic">
+  
+  <header class="module-header">
+    <div class="header-top">
+      <a routerLink="/topics" class="back-link">
+        <span class="icon">←</span> Volver al Temario
+      </a>
+    </div>
+
+    <div class="header-content">
+      <div class="icon-wrapper">
+        <span class="topic-icon">{{ currentTopic.icon }}</span>
+      </div>
+      <div class="text-wrapper">
+        <h1>{{ currentTopic.title }}</h1>
+        <p>{{ currentTopic.description }}</p>
+        
+        <div class="meta-stats">
+          <span class="stat"><span class="emoji">📊</span> {{ exercises.length }} Ejercicios</span>
+          <span class="stat"><span class="emoji">⏱</span> ~{{ currentTopic.totalExercises * 15 }} min</span> </div>
+      </div>
+      
+      <div class="module-progress">
+        <div class="progress-label">Tu Progreso</div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" [style.width.%]="currentTopic.progress"></div>
+        </div>
+        <span class="percent">{{ currentTopic.progress }}%</span>
+      </div>
+    </div>
   </header>
 
-  <div class="exercises-list">
-    <div *ngIf="exercises.length === 0" class="empty-state">
-        <p>No hay ejercicios disponibles para este tema aún.</p>
+  <div class="timeline-container">
+    
+    <div class="empty-state" *ngIf="exercises.length === 0">
+      <p>📭 No hay ejercicios cargados para este tema todavía.</p>
     </div>
 
-    <div class="exercise-card" *ngFor="let ex of exercises">
-      <div class="status-indicator" [class.completed]="ex.completed">
-        <span *ngIf="ex.completed">✅</span>
-        <span *ngIf="!ex.completed">⭕</span>
+    <div class="timeline-item" *ngFor="let ex of exercises; let i = index">
+      
+      <div class="timeline-marker">
+        <div class="line" *ngIf="i < exercises.length - 1"></div> <div class="circle" [class.done]="ex.completed" [class.current]="!ex.completed">
+          <span *ngIf="ex.completed">✓</span>
+          <span *ngIf="!ex.completed">{{ i + 1 }}</span>
+        </div>
       </div>
 
-      <div class="card-content">
-        <h3>{{ ex.title }}</h3>
-        <p>{{ ex.description }}</p>
-        <span class="badge" [class.easy]="ex.difficulty === 'Fácil'" 
-                           [class.medium]="ex.difficulty === 'Medio'"
-                           [class.hard]="ex.difficulty === 'Difícil'">
-          {{ ex.difficulty }}
-        </span>
+      <div class="exercise-card" [class.completed-card]="ex.completed">
+        <div class="card-body">
+          <div class="card-header-row">
+            <span class="badge" 
+                  [class.easy]="ex.difficulty === 'Fácil'"
+                  [class.medium]="ex.difficulty === 'Medio'"
+                  [class.hard]="ex.difficulty === 'Difícil'">
+              {{ ex.difficulty }}
+            </span>
+            <span class="status-text" *ngIf="ex.completed">Completado</span>
+          </div>
+          
+          <h3>{{ ex.title }}</h3>
+          <p>{{ ex.description }}</p>
+        </div>
+
+        <div class="card-action">
+          <button class="btn-action" 
+                  [class.btn-primary]="!ex.completed" 
+                  [class.btn-outline]="ex.completed"
+                  [routerLink]="['/solve', ex.id]">
+            {{ ex.completed ? 'Repasar' : 'Comenzar' }}
+          </button>
+        </div>
       </div>
 
-      <div class="action">
-        <button class="btn-solve" [routerLink]="['/solve', ex.id]">Resolver</button>
-      </div>
     </div>
+
   </div>
 </div>
