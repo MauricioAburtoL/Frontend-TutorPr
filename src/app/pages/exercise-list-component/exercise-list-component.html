@@ -1,4 +1,4 @@
-<div class="container" *ngIf="currentTopic">
+<div class="container" *ngIf="topic$ | async as currentTopic; else loadingTopic">
   
   <header class="module-header">
     <div class="header-top">
@@ -15,9 +15,10 @@
         <h1>{{ currentTopic.title }}</h1>
         <p>{{ currentTopic.description }}</p>
         
-        <div class="meta-stats">
+        <div class="meta-stats" *ngIf="exercises$ | async as exercises">
           <span class="stat"><span class="emoji">📊</span> {{ exercises.length }} Ejercicios</span>
-          <span class="stat"><span class="emoji">⏱</span> ~{{ currentTopic.totalExercises * 15 }} min</span> </div>
+          <span class="stat"><span class="emoji">⏱</span> ~{{ currentTopic.totalExercises * 15 }} min</span> 
+        </div>
       </div>
       
       <div class="module-progress">
@@ -32,46 +33,62 @@
 
   <div class="timeline-container">
     
-    <div class="empty-state" *ngIf="exercises.length === 0">
-      <p>📭 No hay ejercicios cargados para este tema todavía.</p>
-    </div>
-
-    <div class="timeline-item" *ngFor="let ex of exercises; let i = index">
+    <ng-container *ngIf="exercises$ | async as exercises; else loadingExercises">
       
-      <div class="timeline-marker">
-        <div class="line" *ngIf="i < exercises.length - 1"></div> <div class="circle" [class.done]="ex.completed" [class.current]="!ex.completed">
-          <span *ngIf="ex.completed">✓</span>
-          <span *ngIf="!ex.completed">{{ i + 1 }}</span>
-        </div>
+      <div class="empty-state" *ngIf="exercises.length === 0">
+        <p>📭 No hay ejercicios cargados para este tema todavía.</p>
       </div>
 
-      <div class="exercise-card" [class.completed-card]="ex.completed">
-        <div class="card-body">
-          <div class="card-header-row">
-            <span class="badge" 
-                  [class.easy]="ex.difficulty === 'Fácil'"
-                  [class.medium]="ex.difficulty === 'Medio'"
-                  [class.hard]="ex.difficulty === 'Difícil'">
-              {{ ex.difficulty }}
-            </span>
-            <span class="status-text" *ngIf="ex.completed">Completado</span>
+      <div class="timeline-item" *ngFor="let ex of exercises; let i = index">
+        
+        <div class="timeline-marker">
+          <div class="line" *ngIf="i < exercises.length - 1"></div> 
+          <div class="circle" [class.done]="ex.completed" [class.current]="!ex.completed">
+            <span *ngIf="ex.completed">✓</span>
+            <span *ngIf="!ex.completed">{{ i + 1 }}</span>
           </div>
-          
-          <h3>{{ ex.title }}</h3>
-          <p>{{ ex.description }}</p>
         </div>
 
-        <div class="card-action">
-          <button class="btn-action" 
-                  [class.btn-primary]="!ex.completed" 
-                  [class.btn-outline]="ex.completed"
-                  [routerLink]="['/solve', ex.id]">
-            {{ ex.completed ? 'Repasar' : 'Comenzar' }}
-          </button>
+        <div class="exercise-card" [class.completed-card]="ex.completed">
+          <div class="card-body">
+            <div class="card-header-row">
+              <span class="badge" 
+                    [class.easy]="ex.difficulty === 'Fácil'"
+                    [class.medium]="ex.difficulty === 'Medio'"
+                    [class.hard]="ex.difficulty === 'Difícil'">
+                {{ ex.difficulty }}
+              </span>
+              <span class="status-text" *ngIf="ex.completed">Completado</span>
+            </div>
+            
+            <h3>{{ ex.title }}</h3>
+            <p>{{ ex.description }}</p>
+          </div>
+
+          <div class="card-action">
+            <button class="btn-action" 
+                    [class.btn-primary]="!ex.completed" 
+                    [class.btn-outline]="ex.completed"
+                    [routerLink]="['/solve', ex.id]">
+              {{ ex.completed ? 'Repasar' : 'Comenzar' }}
+            </button>
+          </div>
         </div>
+
       </div>
-
-    </div>
+    </ng-container>
 
   </div>
 </div>
+
+<ng-template #loadingTopic>
+  <div class="loading-state">
+    <p>Cargando información del módulo...</p>
+  </div>
+</ng-template>
+
+<ng-template #loadingExercises>
+  <div class="loading-state">
+    <p>Buscando ejercicios disponibles...</p>
+  </div>
+</ng-template>

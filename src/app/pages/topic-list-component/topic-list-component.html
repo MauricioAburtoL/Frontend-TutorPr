@@ -6,23 +6,23 @@
     <p>Explora los módulos de aprendizaje organizados por nivel.</p>
   </header>
 
-  <div class="tabs-container">
+  <div class="tabs-container" *ngIf="selectedCategory$ | async as activeCat">
     <button 
       *ngFor="let cat of categories" 
       class="tab-btn" 
-      [class.active]="selectedCategory === cat"
+      [class.active]="activeCat === cat"
       (click)="selectCategory(cat)">
       {{ cat }}
     </button>
   </div>
 
-  <div class="topics-grid">
+  <div class="topics-grid" *ngIf="filteredTopics$ | async as topics; else loading">
     
-    <div *ngIf="filteredTopics.length === 0" class="empty-msg">
+    <div *ngIf="topics.length === 0" class="empty-msg">
       No hay temas disponibles en esta categoría.
     </div>
 
-    <div class="topic-card" *ngFor="let topic of filteredTopics">
+    <div class="topic-card" *ngFor="let topic of topics">
       
       <div class="card-top">
         <div class="icon-box">
@@ -60,4 +60,11 @@
 
     </div>
   </div>
+
+  <ng-template #loading>
+    <div class="loading-state">
+      <p>Buscando módulos en el servidor...</p>
+    </div>
+  </ng-template>
+
 </div>

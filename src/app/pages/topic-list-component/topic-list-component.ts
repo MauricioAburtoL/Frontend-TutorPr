@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { BehaviorSubject, combineLatest, Observable } from 'rxjs'; // <--- NUEVOS
+import { map } from 'rxjs/operators'; // <--- NUEVO
 import { ContentService, Topic } from '../../core/services/content.service';
 
 @Component({
@@ -11,34 +13,34 @@ import { ContentService, Topic } from '../../core/services/content.service';
   styleUrl: './topic-list-component.scss'
 })
 export class TopicListComponent implements OnInit {
-  allTopics: Topic[] = [];
-  filteredTopics: Topic[] = [];
-  
-  // Categorías disponibles para las pestañas
+  // 1. Creamos un "sujeto" para manejar la categoría seleccionada de forma reactiva
+  private categorySubject = new BehaviorSubject<string>('Todos');
+  selectedCategory$ = this.categorySubject.asObservable();
+
+  // 2. Definimos el flujo de los temas filtrados
+  filteredTopics$!: Observable<Topic[]>;
+
+  // Categorías estáticas para la vista
   categories: string[] = ['Todos', 'Fundamentos', 'Lógica', 'Estructuras'];
-  selectedCategory: string = 'Todos';
 
   constructor(private contentService: ContentService) {}
 
   ngOnInit(): void {
-    this.contentService.getTopics().subscribe(data => {
-      this.allTopics = data;
-      this.filterTopics(); // Inicializamos la vista
-    });
+    // 3. Combinamos el flujo de datos de FastAPI con el flujo de la categoría seleccionada
+    // Esto asegura que si cambia la categoría O llegan datos nuevos, la vista se actualice sola.
+    this.filteredTopics$ = combineLatest([
+      this.contentService.getTopics(),
+      this.selectedCategory$
+    ]).pipe(
+      map(([topics, category]) => {
+        if (category === 'Todos') return topics;
+        return topics.filter(t => t.category === category);
+      })
+    );
   }
 
-  // Método para cambiar de pestaña
+  // 4. Para cambiar de pestaña, solo emitimos el nuevo valor al "sujeto"
   selectCategory(category: string) {
-    this.selectedCategory = category;
-    this.filterTopics();
-  }
-
-  // Filtramos la lista según la selección
-  filterTopics() {
-    if (this.selectedCategory === 'Todos') {
-      this.filteredTopics = this.allTopics;
-    } else {
-      this.filteredTopics = this.allTopics.filter(t => t.category === this.selectedCategory);
-    }
+    this.categorySubject.next(category);
   }
 }

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common'; // <--- NECESARIO para *ngIf, *ngFor y slice
 import { RouterLink } from '@angular/router';
 import { ContentService, UserStats } from '../../core/services/content.service'; // Asegúrate que la ruta sea correcta
+import { Observable } from 'rxjs'; // <--- IMPORTANTE
 
 @Component({
   selector: 'app-home',
@@ -11,13 +12,12 @@ import { ContentService, UserStats } from '../../core/services/content.service';
   styleUrl: './home-component.scss'
 })
 export class HomeComponent implements OnInit {
-  userStats: UserStats | null = null;
+  userStats$: Observable<UserStats> | null = null;
 
   constructor(private contentService: ContentService) {}
 
   ngOnInit() {
-    this.contentService.getUserStats().subscribe(data => {
-      this.userStats = data;
-    });
+      this.userStats$ = this.contentService.getUserStats();
+    
   }
 }

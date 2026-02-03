@@ -1,4 +1,4 @@
-<div class="dashboard-wrapper" *ngIf="userStats">
+<div class="dashboard-wrapper" *ngIf="userStats$ | async as userStats; else loadingState">
   
   <header class="dash-header">
     <div class="welcome-text">
@@ -95,6 +95,8 @@
   </div>
 </div>
 
-<div *ngIf="!userStats" class="loading-state">
-  <p>Cargando tu perfil...</p>
-</div>
+<ng-template #loadingState>
+  <div class="loading-state">
+    <p>Cargando tu perfil de aprendizaje...</p>
+    </div>
+</ng-template>
