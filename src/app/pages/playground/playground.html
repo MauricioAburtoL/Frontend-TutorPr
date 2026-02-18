@@ -6,7 +6,8 @@
     </div>
     </header>
 
-  <section class="problem-context" *ngIf="currentExercise">
+<ng-container *ngIf="currentExercise; else loading">
+  <section class="problem-context">
     <div class="problem-header">
       <h2>
         <span class="icon">📝</span> {{ currentExercise.title }}
@@ -20,6 +21,13 @@
       <p>{{ currentExercise.description }}</p>
     </div>
   </section>
+</ng-container>
+
+<ng-template #loading>
+  <section class="problem-context">
+    <p>Cargando información del ejercicio...</p>
+  </section>
+</ng-template>
 
   <div class="workspace">
     

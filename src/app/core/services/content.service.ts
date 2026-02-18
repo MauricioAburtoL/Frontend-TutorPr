@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 // --- INTERFACES (Se mantienen igual para asegurar la compatibilidad) ---
 
@@ -97,4 +97,19 @@ export class ContentService {
   getUserStats(userId: string = 'student_01'): Observable<UserStats> {
     return this.http.get<UserStats>(`${this.apiUrl}/user/${userId}/stats`);
   }
+  /**
+   * NUEVO MÉTODO: Obtiene un ejercicio específico por su ID.
+   * Esto conectará la URL /solve/e1 con los datos de tu tabla 'exercises'.
+   */
+  getExerciseById(exerciseId: string): Observable<Exercise | undefined> {
+    // Si tienes un endpoint directo en FastAPI: GET /api/kpis/exercises/{id}
+    return this.http.get<Exercise>(`${this.apiUrl}/exercises/${exerciseId}`).pipe(
+      catchError(err => {
+        console.error('Error al recuperar el ejercicio:', err);
+        return of(undefined);
+      })
+    );
+  }
+
+  
 }

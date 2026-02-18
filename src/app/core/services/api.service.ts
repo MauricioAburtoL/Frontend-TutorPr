@@ -1,16 +1,21 @@
-// src/app/core/services/api.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export type Lang = 'python' | 'java' | 'cpp';
 
+/**
+ * Interfaz de respuesta de ejecución técnica y pedagógica.
+ * Refleja los cambios realizados en ExecutionService.py y execute.py.
+ */
 export interface ExecOut {
-  status: 'ok' | 'error';
-  stdout?: string;
-  stderr?: string;
+  status: 'ok' | 'error' | 'running'; // Añadido 'running' para mejorar UX (Heurística #1)
+  stdout: string;
+  stderr: string;
   error_type?: string | null;
   runtime_ms?: number | null;
+  is_correct?: boolean; // Veredicto de los casos de prueba del backend
+  failed_case?: string | null; // Información sobre qué test falló
 }
 
 export interface HintOut {
@@ -19,9 +24,14 @@ export interface HintOut {
   concept?: string;
 }
 
-export interface CfgOut { mermaid: string; }
+export interface CfgOut {
+  mermaid: string;
+}
 
-// 👉 tip opcional para no repetir
+/**
+ * Payload de entrada para la ejecución.
+ * Coincide con el esquema 'ExecuteIn' de tu FastAPI.
+ */
 export interface ExecInPayload {
   user_id: string;
   session_id: string;
@@ -29,44 +39,63 @@ export interface ExecInPayload {
   attempt_id: string;
   code: string;
   lang: Lang;
+  duration_ms?: number;
 }
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
-  constructor(private http: HttpClient) {}
+  // Ajusta esta URL según tu configuración de proxy o entorno
+  private readonly baseUrl = '/api';
 
-  // Helper para generar IDs de prueba
-  private attemptId() { return Date.now().toString(); }
+  constructor(private http: HttpClient) { }
 
-  // ⚠️ Enviar TODO lo que tu backend espera (ExecuteIn)
-  run(code: string, lang: Lang): Observable<ExecOut> {
+  /**
+   * Genera un ID de intento basado en el timestamp.
+   */
+  private attemptId(): string {
+    return Date.now().toString();
+  }
+
+  /**
+   * Ejecuta el código y valida la lógica pedagógica.
+   * @param code Código fuente del alumno.
+   * @param lang Lenguaje seleccionado.
+   * @param exerciseId ID del ejercicio actual (ej. 'e1').
+   */
+  run(code: string, lang: Lang, exerciseId: string = 'unknown'): Observable<ExecOut> {
     const body: ExecInPayload = {
-      user_id:    'demo-user',
+      user_id: 'student_01', // Usuario demo para tu tesis
       session_id: 'local-session',
-      exercise_id:'ex-1',
+      exercise_id: exerciseId,
       attempt_id: this.attemptId(),
-      code,
-      lang
+      code: code,
+      lang: lang,
+      duration_ms: 0 // Podrías calcular el tiempo real en el frontend
     };
-    return this.http.post<ExecOut>('/api/execute', body);
+
+    return this.http.post<ExecOut>(`${this.baseUrl}/execute`, body);
   }
 
-  // ⚠️ Enviar TODO lo que tu backend espera (HintIn)
-  hint(code: string, exec_result: any, lang: Lang): Observable<HintOut> {
+  // En api.service.ts
+
+  hint(code: string, exec_result: any, lang: Lang, exerciseId: string): Observable<HintOut> {
     const body = {
-      user_id:    'demo-user',
+      user_id: 'student_01',
       session_id: 'local-session',
-      exercise_id:'ex-1',
+      exercise_id: exerciseId,
       attempt_id: this.attemptId(),
-      code,
-      exec_result,
-      lang
+      code: code,
+      lang: lang,                     // Asegúrate de que se llame 'lang'
+      // Forzamos que sea un objeto plano para evitar problemas de serialización
+      exec_result: JSON.parse(JSON.stringify(exec_result || {}))
     };
-    return this.http.post<HintOut>('/api/hint', body);
-  }
 
-  // ✅ ya lo corregiste: usamos /api/cfg/{lang}
+    return this.http.post<HintOut>(`${this.baseUrl}/hint`, body);
+  }
+  /**
+   * Genera el Diagrama de Flujo (CFG) para visualización lógica.
+   */
   cfg(lang: Lang, code: string): Observable<CfgOut> {
-    return this.http.post<CfgOut>(`/api/cfg/${lang}`, { code });
+    return this.http.post<CfgOut>(`${this.baseUrl}/cfg/${lang}`, { code });
   }
 }

@@ -2,12 +2,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router'; // <--- Importante
+import { ActivatedRoute, Router } from '@angular/router';
 import mermaid from 'mermaid';
 
 // Importa tipos y servicio
 import { ApiService, ExecOut, HintOut, Lang } from '../../core/services/api.service';
-import { ContentService, Exercise } from '../../core/services/content.service'; // <--- Tu servicio de datos
+import { ContentService, Exercise } from '../../core/services/content.service';
 
 // Feature components (standalone)
 import { CodeEditor } from '../../features/code-editor/code-editor';
@@ -26,7 +26,7 @@ mermaid.initialize({ startOnLoad: false });
 })
 export class Playground implements OnInit {
   currentExercise: Exercise | undefined;
-  code = `for i in range(5):\n    print(i)`;
+  code = '';
   execOut: Partial<ExecOut> = {};
   hint = '';
   mermaidSrc = '';
@@ -37,70 +37,134 @@ export class Playground implements OnInit {
 
   constructor(
     private api: ApiService,
-    private contentService: ContentService, // Inyectamos servicio de contenido
-    private route: ActivatedRoute           // Inyectamos router para leer la URL
-  ) {}
+    private contentService: ContentService,
+    private route: ActivatedRoute,
+    private router: Router // Agregado para navegación
+  ) { }
 
   ngOnInit() {
-    // Detectamos si hay un ID en la URL (ej: /solve/e1)
     this.route.paramMap.subscribe(params => {
       const exerciseId = params.get('exerciseId');
-      
       if (exerciseId) {
-        // Buscamos el ejercicio correspondiente en el servicio
-        // Nota: Usamos 'getTopicById' o un método para buscar en todos los ejercicios.
-        // Aquí simulamos buscarlo en la lista mockeada para que funcione ya mismo:
-        this.contentService.getExercisesByTopic(exerciseId).subscribe(exercises => {
-             // Si tu servicio filtra por tema, aquí necesitarías una lógica para obtener 
-             // el ejercicio específico por ID. Por ahora, para que no falle, 
-             // intentamos buscar en todos los temas o asumimos que el servicio lo devuelve.
-             
-             // Opción rápida para que veas el título en pantalla (Mock local si no tienes el método exacto):
-             this.contentService.getTopicById('intro-python').subscribe(() => {
-                // Simulación para que veas datos:
-                // En una implementación real: this.contentService.getExercise(exerciseId)...
-                this.currentExercise = {
-                    id: exerciseId,
-                    topicId: 'demo',
-                    title: 'Ejercicio Seleccionado', 
-                    description: 'Esta descripción se ha cargado dinámicamente según el ID ' + exerciseId,
-                    difficulty: 'Fácil',
-                    completed: false
-                };
-             });
-        });
-        // Si ya implementaste un método getExerciseById(id) en ContentService, úsalo así:
-        // this.contentService.getExerciseById(exerciseId).subscribe(ex => this.currentExercise = ex);
+        this.resetState(); // Limpiamos consola y pistas al cambiar de ejercicio
+        this.loadExercise(exerciseId);
       }
     });
   }
 
-  // Two-way del editor
+  private resetState() {
+    this.execOut = {};
+    this.hint = '';
+    this.mermaidSrc = '';
+  }
+
+  private loadExercise(id: string) {
+    this.contentService.getExerciseById(id).subscribe({
+      next: (ex) => {
+        console.log('Ejercicio recibido:', ex); // 👈 Agrega este log para debuguear
+        if (ex) {
+          this.currentExercise = { ...ex };
+          // Cambiamos 'ex.title' por 'currentExercise?.title' para mayor seguridad
+          this.code = (ex as any).baseCode || `# Solución para: ${this.currentExercise?.title}\n`;
+        }
+      },
+      error: (err) => console.error('Error al cargar ejercicio:', err)
+    });
+  }
+
   onCodeChange(newCode: string) {
     this.code = newCode;
   }
 
-  // Ejecutar código (envía payload completo con lang)
+  // --- LÓGICA DE EJECUCIÓN CON VALIDACIÓN ---
   onRun() {
-    this.api.run(this.code, this.lang).subscribe((res) => {
-      this.execOut = res || {};
+    if (!this.currentExercise) return;
+
+    // Heurística #1: El usuario debe saber que el sistema está trabajando
+    this.execOut = { stdout: 'Ejecutando y validando...', status: 'running' };
+
+    this.api.run(this.code, this.lang, this.currentExercise.id).subscribe({
+      next: (res: any) => {
+        this.execOut = res || {};
+
+        // Verificación Pedagógica (is_correct viene del nuevo execute.py)
+        if (res.is_correct) {
+          this.currentExercise!.completed = true;
+          // Feedback de éxito (Puede ser un Toast o Modal en lugar de alert para mejor UX)
+          console.log("¡Éxito pedagógico detectado!");
+        } else if (res.status === 'ok' && !res.is_correct) {
+          // El código no falló técnicamente, pero no cumple el objetivo
+          console.warn("Código válido, pero lógica incorrecta para este ejercicio.");
+        }
+      },
+      error: (err) => {
+        this.execOut = { status: 'error', stderr: 'Error de conexión con el servidor.' };
+      }
     });
   }
+  // src/app/pages/playground/playground.ts
 
-  // Pedir pista (usa también execOut y lang)
   onHint() {
-    this.api.hint(this.code, this.execOut, this.lang).subscribe((r: HintOut) => {
-      this.hint = r?.hint ?? '';
+    if (!this.currentExercise) return;
+
+    // Ahora pasamos los 4 parámetros: code, execOut, lang y el ID del ejercicio
+    this.api.hint(
+      this.code,
+      this.execOut,
+      this.lang,
+      this.currentExercise.id // <--- Este es el argumento que falta
+    ).subscribe({
+      next: (r: HintOut) => {
+        this.hint = r?.hint ?? '';
+      },
+      error: (err) => {
+        console.error("Error al obtener pista:", err);
+      }
     });
   }
 
-  // Generar CFG con el lenguaje seleccionado
+  // onHint() {
+  //   this.api.hint(this.code, this.execOut, this.lang).subscribe((r: HintOut) => {
+  //     this.hint = r?.hint ?? '';
+  //   });
+  // }
+
+  //   onHint() {
+  //   if (!this.currentExercise) return;
+
+  //   // Pasamos: código, resultado previo, lenguaje e ID del ejercicio
+  //   this.api.hint(
+  //     this.code, 
+  //     this.execOut, 
+  //     this.lang, 
+  //     this.currentExercise.id // 👈 Crucial para evitar el 422
+  //   ).subscribe({
+  //     next: (r: HintOut) => {
+  //       this.hint = r?.hint ?? '';
+  //     },
+  //     error: (err) => {
+  //       console.error("Error al obtener pista:", err);
+  //     }
+  //   });
+  // }
+
   onCFG() {
     this.api.cfg(this.lang, this.code).subscribe(async (r) => {
       this.mermaidSrc = r?.mermaid ?? '';
-      // Si prefieres renderizar a SVG aquí:
-      // const { svg } = await mermaid.render('graph1', this.mermaidSrc);
-      // this.mermaidSrc = svg;
     });
+  }
+
+  /**
+   * Navega al siguiente ejercicio disponible
+   * Útil para mantener el flujo de aprendizaje (Flow state)
+   */
+  goToNext() {
+    if (!this.currentExercise) return;
+
+    // Lógica simple: extraer el número del ID (ej: e1 -> e2)
+    const currentIdNum = parseInt(this.currentExercise.id.replace('e', ''));
+    const nextId = `e${currentIdNum + 1}`;
+
+    this.router.navigate(['/solve', nextId]);
   }
 }
