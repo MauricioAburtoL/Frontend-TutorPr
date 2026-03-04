@@ -3,10 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import mermaid from 'mermaid';
 
-// Importa tipos y servicio
-import { ApiService, ExecOut, HintOut, Lang } from '../../core/services/api.service';
+import { ApiService, ExecOut, HintOut, DetectedError, Lang } from '../../core/services/api.service';
 import { ContentService, Exercise } from '../../core/services/content.service';
 
 // Feature components (standalone)
@@ -14,8 +12,6 @@ import { CodeEditor } from '../../features/code-editor/code-editor';
 import { OutputConsole } from '../../features/output-console/output-console';
 import { HintPanel } from '../../features/hint-panel/hint-panel';
 import { CfgViewer } from '../../features/cfg-viewer/cfg-viewer';
-
-mermaid.initialize({ startOnLoad: false });
 
 @Component({
   selector: 'app-playground',
@@ -30,8 +26,8 @@ export class Playground implements OnInit {
   execOut: Partial<ExecOut> = {};
   hint = '';
   mermaidSrc = '';
+  detectedErrors: DetectedError[] = [];
 
-  // Selector de lenguaje
   lang: Lang = 'python';
   langs: Lang[] = ['python', 'java', 'cpp'];
 
@@ -56,12 +52,12 @@ export class Playground implements OnInit {
     this.execOut = {};
     this.hint = '';
     this.mermaidSrc = '';
+    this.detectedErrors = [];
   }
 
   private loadExercise(id: string) {
     this.contentService.getExerciseById(id).subscribe({
       next: (ex) => {
-        console.log('Ejercicio recibido:', ex); // 👈 Agrega este log para debuguear
         if (ex) {
           this.currentExercise = { ...ex };
           // Cambiamos 'ex.title' por 'currentExercise?.title' para mayor seguridad
@@ -74,6 +70,7 @@ export class Playground implements OnInit {
 
   onCodeChange(newCode: string) {
     this.code = newCode;
+    this.detectedErrors = [];
   }
 
   // --- LÓGICA DE EJECUCIÓN CON VALIDACIÓN ---
@@ -102,7 +99,6 @@ export class Playground implements OnInit {
       }
     });
   }
-  // src/app/pages/playground/playground.ts
 
   onHint() {
     if (!this.currentExercise) return;
@@ -122,31 +118,6 @@ export class Playground implements OnInit {
       }
     });
   }
-
-  // onHint() {
-  //   this.api.hint(this.code, this.execOut, this.lang).subscribe((r: HintOut) => {
-  //     this.hint = r?.hint ?? '';
-  //   });
-  // }
-
-  //   onHint() {
-  //   if (!this.currentExercise) return;
-
-  //   // Pasamos: código, resultado previo, lenguaje e ID del ejercicio
-  //   this.api.hint(
-  //     this.code, 
-  //     this.execOut, 
-  //     this.lang, 
-  //     this.currentExercise.id // 👈 Crucial para evitar el 422
-  //   ).subscribe({
-  //     next: (r: HintOut) => {
-  //       this.hint = r?.hint ?? '';
-  //     },
-  //     error: (err) => {
-  //       console.error("Error al obtener pista:", err);
-  //     }
-  //   });
-  // }
 
   onCFG() {
     this.api.cfg(this.lang, this.code).subscribe(async (r) => {

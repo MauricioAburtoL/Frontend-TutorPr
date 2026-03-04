@@ -24,6 +24,21 @@ export interface HintOut {
   concept?: string;
 }
 
+export interface DetectedError {
+  line: number;
+  type: 'logic' | 'syntax';
+  desc: string;
+}
+
+export interface AssistResponse {
+  status: 'error' | 'success' | 'warning';
+  pedagogical_feedback: string;
+  technical_hints: string[];
+  detected_errors: DetectedError[];
+  mermaid_chart: string;
+  next_step_question: string;
+}
+
 export interface CfgOut {
   mermaid: string;
 }

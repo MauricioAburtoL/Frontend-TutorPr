@@ -1,0 +1,126 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.editor-wrapper {
+  height: 100%;
+  overflow: hidden;
+  background: #1e1e2e;
+}
+
+/* ---- CodeMirror base overrides ---- */
+.cm-editor {
+  height: 100%;
+  font-size: 14px;
+  background: #1e1e2e;
+
+  &.cm-focused {
+    outline: none;
+  }
+}
+
+.cm-scroller {
+  overflow: auto;
+  font-family: 'Consolas', 'Fira Code', monospace;
+}
+
+.cm-content {
+  caret-color: #f8f8f2;
+  color: #f8f8f2;
+}
+
+.cm-activeLine {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+.cm-activeLineGutter {
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+/* ---- Error gutter column ---- */
+.cm-error-gutter {
+  width: 16px;
+  padding: 0 2px;
+}
+
+.cm-gutter-error {
+  color: #ff5555;
+  font-size: 10px;
+  line-height: 1;
+}
+
+.cm-gutter-warning {
+  color: #ffb86c;
+  font-size: 10px;
+  line-height: 1;
+}
+
+/* ---- Error line highlights ---- */
+.cm-error-line {
+  background-color: rgba(255, 85, 85, 0.12);
+  border-left: 3px solid #ff5555;
+}
+
+.cm-warning-line {
+  background-color: rgba(255, 184, 108, 0.10);
+  border-left: 3px solid #ffb86c;
+}
+
+/* ---- Hover tooltip ---- */
+.cm-error-tooltip {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 12px;
+  max-width: 360px;
+  background: #282a36;
+  border: 1px solid #44475a;
+  border-radius: 6px;
+  color: #f8f8f2;
+  font-size: 0.82rem;
+  font-family: 'Inter', system-ui, sans-serif;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.tooltip-badge-error {
+  display: inline-block;
+  background: rgba(255, 85, 85, 0.2);
+  color: #ff5555;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  width: fit-content;
+}
+
+.tooltip-badge-warning {
+  display: inline-block;
+  background: rgba(255, 184, 108, 0.2);
+  color: #ffb86c;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  width: fit-content;
+}
+
+.tooltip-desc {
+  color: #cdd6f4;
+  line-height: 1.4;
+}
+
+/* ---- CodeMirror tooltip container override ---- */
+.cm-tooltip {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.cm-tooltip-hover {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+}

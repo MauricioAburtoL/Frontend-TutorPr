@@ -44,6 +44,8 @@
       <div class="editor-container">
         <app-code-editor
           [code]="code"
+          [lang]="lang"
+          [detectedErrors]="detectedErrors"
           (codeChange)="onCodeChange($event)">
         </app-code-editor>
       </div>
