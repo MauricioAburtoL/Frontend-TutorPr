@@ -1,4 +1,5 @@
 <div class="hint-box" *ngIf="hint as h">
   <strong>🤖 Pista del Asistente:</strong>
   <p>{{ h }}</p>
+  <p class="hint-more" *ngIf="hasMore">Haz clic en "Pista" para ver la siguiente pista.</p>
 </div>

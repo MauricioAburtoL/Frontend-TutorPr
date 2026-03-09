@@ -25,6 +25,7 @@ export class Playground implements OnInit {
   code = '';
   execOut: Partial<ExecOut> = {};
   hint = '';
+  hasMoreHints = false;
   mermaidSrc = '';
   detectedErrors: DetectedError[] = [];
 
@@ -51,6 +52,7 @@ export class Playground implements OnInit {
   private resetState() {
     this.execOut = {};
     this.hint = '';
+    this.hasMoreHints = false;
     this.mermaidSrc = '';
     this.detectedErrors = [];
   }
@@ -112,6 +114,8 @@ export class Playground implements OnInit {
     ).subscribe({
       next: (r: HintOut) => {
         this.hint = r?.hint ?? '';
+        this.hasMoreHints = r?.has_more_hints ?? false;
+        this.detectedErrors = r?.detected_errors ?? [];
       },
       error: (err) => {
         console.error("Error al obtener pista:", err);
@@ -120,7 +124,7 @@ export class Playground implements OnInit {
   }
 
   onCFG() {
-    this.api.cfg(this.lang, this.code).subscribe(async (r) => {
+    this.api.cfg(this.lang, this.code, this.currentExercise?.id).subscribe(async (r) => {
       this.mermaidSrc = r?.mermaid ?? '';
     });
   }

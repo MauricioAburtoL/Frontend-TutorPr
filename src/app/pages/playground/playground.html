@@ -54,7 +54,7 @@
         <app-output-console [execOut]="execOut"></app-output-console>
       </div>
       
-      <app-hint-panel [hint]="hint" *ngIf="hint"></app-hint-panel>
+      <app-hint-panel [hint]="hint" [hasMore]="hasMoreHints" *ngIf="hint"></app-hint-panel>
     </section>
 
     <section class="panel visualization-panel">

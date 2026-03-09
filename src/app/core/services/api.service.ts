@@ -22,6 +22,9 @@ export interface HintOut {
   hint: string;
   pattern_id?: string;
   concept?: string;
+  source?: string;
+  has_more_hints?: boolean;
+  detected_errors?: DetectedError[];
 }
 
 export interface DetectedError {
@@ -41,6 +44,7 @@ export interface AssistResponse {
 
 export interface CfgOut {
   mermaid: string;
+  source?: string; // "gemini" | "ast"
 }
 
 /**
@@ -109,8 +113,18 @@ export class ApiService {
   }
   /**
    * Genera el Diagrama de Flujo (CFG) para visualización lógica.
+   * Si se proporciona exerciseId, intenta usar el mermaid de Gemini desde cache.
+   * Fallback: generación AST local.
    */
-  cfg(lang: Lang, code: string): Observable<CfgOut> {
+  cfg(lang: Lang, code: string, exerciseId?: string): Observable<CfgOut> {
+    if (exerciseId) {
+      return this.http.post<CfgOut>(`${this.baseUrl}/cfg`, {
+        code,
+        lang,
+        user_id: 'student_01',
+        exercise_id: exerciseId,
+      });
+    }
     return this.http.post<CfgOut>(`${this.baseUrl}/cfg/${lang}`, { code });
   }
 }

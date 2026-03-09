@@ -1,1 +1,86 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+
+  --bg-base: #0f0f13;
+  --bg-surface: #18181f;
+  --bg-elevated: #1e1e28;
+  --bg-hover: #252530;
+  --bg-input: #1a1a24;
+
+  --border: #2a2a38;
+  --border-subtle: #222230;
+
+  --text-primary: #e4e4eb;
+  --text-secondary: #9394a0;
+  --text-muted: #5f6070;
+
+  --accent: #6c63ff;
+  --accent-hover: #7b73ff;
+  --accent-subtle: rgba(108, 99, 255, 0.12);
+
+  --green: #34d399;
+  --green-subtle: rgba(52, 211, 153, 0.12);
+  --green-text: #6ee7b7;
+
+  --red: #f87171;
+  --red-subtle: rgba(248, 113, 113, 0.12);
+
+  --amber: #fbbf24;
+  --amber-subtle: rgba(251, 191, 36, 0.12);
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  &:hover { color: var(--accent-hover); }
+}
+
+button {
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: var(--accent);
+  color: white;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+  &:hover { background: var(--text-muted); }
+}

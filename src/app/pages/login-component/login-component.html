@@ -1,29 +1,32 @@
 <div class="login-container">
   <div class="login-card">
-    <h2>Bienvenido a Edu Assistant</h2>
-    <p>Ingresa tus credenciales para continuar</p>
+    <div class="logo-area">
+      <span class="logo-mark">T</span>
+      <h2>TutorATS</h2>
+    </div>
+    <p class="subtitle">Ingresa para continuar</p>
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-      
-      <div class="form-group">
+
+      <div class="field">
         <label>Usuario</label>
-        <input type="text" formControlName="username" placeholder="Ej: alumno">
+        <input type="text" formControlName="username" placeholder="tu usuario">
       </div>
 
-      <div class="form-group">
-        <label>Contraseña</label>
-        <input type="password" formControlName="password" placeholder="***">
+      <div class="field">
+        <label>Contrasena</label>
+        <input type="password" formControlName="password" placeholder="tu contrasena">
       </div>
 
-      <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+      <p *ngIf="errorMessage" class="error-msg">{{ errorMessage }}</p>
 
-      <button type="submit" [disabled]="isLoading || loginForm.invalid">
-        {{ isLoading ? 'Entrando...' : 'Iniciar Sesión' }}
+      <button type="submit" class="btn-submit" [disabled]="isLoading || loginForm.invalid">
+        {{ isLoading ? 'Entrando...' : 'Entrar' }}
       </button>
     </form>
-    
-    <div class="hints">
-      <small>Prueba: <b>alumno / 123</b> o <b>profe / 123</b></small>
+
+    <div class="demo-hint">
+      <small>Demo: <code>alumno / 123</code> o <code>profe / 123</code></small>
     </div>
   </div>
 </div>

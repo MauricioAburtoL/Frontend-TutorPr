@@ -10,4 +10,5 @@ import { CommonModule } from '@angular/common';
 })
 export class HintPanel {
   @Input() hint: string | null = null;
+  @Input() hasMore: boolean = false;
 }
