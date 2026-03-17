@@ -1,44 +1,65 @@
 <div class="main-layout">
-  
+
   <header class="app-header">
     <div class="brand">
-      <h1>Edu Assistant <span class="badge-beta">Beta</span></h1>
+      <h1>TutorATS</h1>
     </div>
-    </header>
+  </header>
 
-<ng-container *ngIf="currentExercise; else loading">
-  <section class="problem-context">
-    <div class="problem-header">
-      <h2>
-        <span class="icon">📝</span> {{ currentExercise.title }}
-        <span class="difficulty-badge" 
-              [class.easy]="currentExercise.difficulty === 'Fácil'"
-              [class.medium]="currentExercise.difficulty === 'Medio'"
-              [class.hard]="currentExercise.difficulty === 'Difícil'">
-          {{ currentExercise.difficulty }}
-        </span>
-      </h2>
-      <p>{{ currentExercise.description }}</p>
-    </div>
-  </section>
-</ng-container>
+  <ng-container *ngIf="currentExercise; else loading">
+    <section class="problem-context">
+      <div class="problem-header">
+        <h2>
+          {{ currentExercise.title }}
+          <span class="difficulty-badge"
+                [class.easy]="currentExercise.difficulty === 'Fácil'"
+                [class.medium]="currentExercise.difficulty === 'Medio'"
+                [class.hard]="currentExercise.difficulty === 'Difícil'">
+            {{ currentExercise.difficulty }}
+          </span>
+          <span class="badge-completed" *ngIf="currentExercise.completed">Completado</span>
+        </h2>
+        <p>{{ currentExercise.description }}</p>
+      </div>
+    </section>
+  </ng-container>
 
-<ng-template #loading>
-  <section class="problem-context">
-    <p>Cargando información del ejercicio...</p>
-  </section>
-</ng-template>
+  <ng-template #loading>
+    <section class="problem-context">
+      <p>Cargando ejercicio...</p>
+    </section>
+  </ng-template>
 
   <div class="workspace">
-    
+
     <section class="panel editor-panel">
       <div class="panel-toolbar">
-        <span class="panel-label">Editor de Código (Python)</span>
+        <span class="panel-label">Editor</span>
         <div class="actions">
-          <button class="btn btn-sm btn-ghost" (click)="onHint()">💡 Pista</button>
-          <button class="btn btn-sm btn-secondary" (click)="onCFG()">🔀 Ver Diagrama</button>
-          <button class="btn btn-sm btn-primary" (click)="onRun()">▶ Ejecutar</button>
+          <button class="btn btn-sm btn-ghost" (click)="onHint()" [disabled]="hintLoading">
+            {{ hintLoading ? 'Procesando...' : 'Pista' }}
+          </button>
+          <button class="btn btn-sm btn-secondary" (click)="onCFG()" [disabled]="cfgLoading">
+            {{ cfgLoading ? 'Procesando...' : 'Ver diagrama' }}
+          </button>
+          <button class="btn btn-sm btn-primary" (click)="onRun()" [disabled]="runLoading">
+            {{ runLoading ? 'Procesando...' : 'Ejecutar' }}
+          </button>
         </div>
+      </div>
+
+      <div class="hint-navigator" *ngIf="hints.length > 0">
+        <button class="hint-nav-arrow" (click)="onPrevHint()" [disabled]="!canGoPrev" title="Pista anterior">‹</button>
+        <div class="hint-dots">
+          <span *ngFor="let h of hints; let i = index"
+                class="hint-dot"
+                [class.active]="i === currentHintIndex"
+                (click)="goToHint(i)"
+                [title]="'Pista ' + (i + 1)">
+          </span>
+          <span class="hint-dot pending" *ngIf="hasMoreHints" title="Hay más pistas disponibles"></span>
+        </div>
+        <button class="hint-nav-arrow" (click)="onNextHint()" [disabled]="!canGoNext" title="Siguiente pista">›</button>
       </div>
 
       <div class="editor-container">
@@ -46,6 +67,7 @@
           [code]="code"
           [lang]="lang"
           [detectedErrors]="detectedErrors"
+          [highlightLines]="cfgHighlightLines"
           (codeChange)="onCodeChange($event)">
         </app-code-editor>
       </div>
@@ -53,22 +75,39 @@
       <div class="console-wrapper">
         <app-output-console [execOut]="execOut"></app-output-console>
       </div>
-      
-      <app-hint-panel [hint]="hint" [hasMore]="hasMoreHints" *ngIf="hint"></app-hint-panel>
+
+      <div class="success-strip" *ngIf="currentExercise?.completed">
+        <span class="success-text">Ejercicio completado</span>
+        <span class="runtime-info" *ngIf="execOut.runtime_ms != null">{{ execOut.runtime_ms }} ms</span>
+        <button class="btn-next" (click)="goToNext()">Siguiente &rarr;</button>
+      </div>
+
+      <div class="hint-loading-placeholder" *ngIf="hintLoading">
+        <span class="hint-spinner"></span> Generando sugerencia...
+      </div>
+
+      <app-hint-panel [hint]="hint" [hasMore]="hasMoreHints" *ngIf="hint && !hintLoading"></app-hint-panel>
     </section>
 
     <section class="panel visualization-panel">
       <div class="panel-header">
         <span class="panel-title">Diagrama de Flujo (CFG)</span>
-        <small class="text-muted">Visualiza la lógica de tu código</small>
       </div>
 
       <div class="diagram-canvas">
-        <div *ngIf="!mermaidSrc" class="empty-state-diagram">
-          <span>🔀</span>
-          <p>Presiona "Ver Diagrama" para generar la visualización.</p>
+        <div class="diagram-loading" *ngIf="cfgLoading">
+          <span class="diagram-spinner"></span>
+          <span>Generando diagrama...</span>
         </div>
-        <app-cfg-viewer [mermaidSrc]="mermaidSrc" *ngIf="mermaidSrc"></app-cfg-viewer>
+        <div *ngIf="!cfgLoading && !mermaidSrc" class="empty-state-diagram">
+          <p>Ejecuta "Ver diagrama" para generar el CFG de tu código</p>
+        </div>
+        <app-cfg-viewer
+          [mermaidSrc]="mermaidSrc"
+          [cfgNodes]="cfgNodes"
+          (nodeHover)="onNodeHover($event)"
+          *ngIf="mermaidSrc && !cfgLoading">
+        </app-cfg-viewer>
       </div>
     </section>
 

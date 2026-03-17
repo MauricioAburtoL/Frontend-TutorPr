@@ -1,10 +1,10 @@
 // src/app/pages/playground/playground.ts
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { ApiService, ExecOut, HintOut, DetectedError, Lang } from '../../core/services/api.service';
+import { ApiService, ExecOut, HintOut, DetectedError, Lang, CfgNode } from '../../core/services/api.service';
 import { ContentService, Exercise } from '../../core/services/content.service';
 
 // Feature components (standalone)
@@ -24,10 +24,19 @@ export class Playground implements OnInit {
   currentExercise: Exercise | undefined;
   code = '';
   execOut: Partial<ExecOut> = {};
+  hints: string[] = [];
+  currentHintIndex = -1;
   hint = '';
   hasMoreHints = false;
   mermaidSrc = '';
   detectedErrors: DetectedError[] = [];
+
+  cfgNodes: CfgNode[] = [];
+  cfgHighlightLines: { from: number; to: number } | null = null;
+
+  cfgLoading = false;
+  hintLoading = false;
+  runLoading = false;
 
   lang: Lang = 'python';
   langs: Lang[] = ['python', 'java', 'cpp'];
@@ -36,7 +45,8 @@ export class Playground implements OnInit {
     private api: ApiService,
     private contentService: ContentService,
     private route: ActivatedRoute,
-    private router: Router // Agregado para navegación
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit() {
@@ -49,12 +59,32 @@ export class Playground implements OnInit {
     });
   }
 
+  get canGoPrev(): boolean {
+    return this.currentHintIndex > 0;
+  }
+
+  get canGoNext(): boolean {
+    return this.currentHintIndex < this.hints.length - 1;
+  }
+
+  goToHint(index: number) {
+    this.currentHintIndex = index;
+    this.hint = this.hints[index] ?? '';
+  }
+
   private resetState() {
     this.execOut = {};
+    this.hints = [];
+    this.currentHintIndex = -1;
     this.hint = '';
     this.hasMoreHints = false;
     this.mermaidSrc = '';
     this.detectedErrors = [];
+    this.cfgNodes = [];
+    this.cfgHighlightLines = null;
+    this.cfgLoading = false;
+    this.hintLoading = false;
+    this.runLoading = false;
   }
 
   private loadExercise(id: string) {
@@ -62,8 +92,8 @@ export class Playground implements OnInit {
       next: (ex) => {
         if (ex) {
           this.currentExercise = { ...ex };
-          // Cambiamos 'ex.title' por 'currentExercise?.title' para mayor seguridad
           this.code = (ex as any).baseCode || `# Solución para: ${this.currentExercise?.title}\n`;
+          this.cdr.detectChanges();
         }
       },
       error: (err) => console.error('Error al cargar ejercicio:', err)
@@ -77,56 +107,87 @@ export class Playground implements OnInit {
 
   // --- LÓGICA DE EJECUCIÓN CON VALIDACIÓN ---
   onRun() {
-    if (!this.currentExercise) return;
+    if (!this.currentExercise || this.runLoading) return;
 
-    // Heurística #1: El usuario debe saber que el sistema está trabajando
+    this.runLoading = true;
     this.execOut = { stdout: 'Ejecutando y validando...', status: 'running' };
 
     this.api.run(this.code, this.lang, this.currentExercise.id).subscribe({
       next: (res: any) => {
         this.execOut = res || {};
+        this.runLoading = false;
 
         // Verificación Pedagógica (is_correct viene del nuevo execute.py)
         if (res.is_correct) {
           this.currentExercise!.completed = true;
-          // Feedback de éxito (Puede ser un Toast o Modal en lugar de alert para mejor UX)
           console.log("¡Éxito pedagógico detectado!");
         } else if (res.status === 'ok' && !res.is_correct) {
-          // El código no falló técnicamente, pero no cumple el objetivo
           console.warn("Código válido, pero lógica incorrecta para este ejercicio.");
         }
+
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.execOut = { status: 'error', stderr: 'Error de conexión con el servidor.' };
+        this.runLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }
 
   onHint() {
-    if (!this.currentExercise) return;
-
-    // Ahora pasamos los 4 parámetros: code, execOut, lang y el ID del ejercicio
-    this.api.hint(
-      this.code,
-      this.execOut,
-      this.lang,
-      this.currentExercise.id // <--- Este es el argumento que falta
-    ).subscribe({
+    if (!this.currentExercise || this.hintLoading) return;
+    this.hintLoading = true;
+    this.api.hint(this.code, this.execOut, this.lang, this.currentExercise.id).subscribe({
       next: (r: HintOut) => {
-        this.hint = r?.hint ?? '';
+        const newHint = r?.hint ?? '';
+        if (newHint) {
+          this.hints.push(newHint);
+          this.goToHint(this.hints.length - 1);
+        }
         this.hasMoreHints = r?.has_more_hints ?? false;
         this.detectedErrors = r?.detected_errors ?? [];
+        this.hintLoading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error("Error al obtener pista:", err);
+        this.hintLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }
 
+  onPrevHint() {
+    if (this.canGoPrev) this.goToHint(this.currentHintIndex - 1);
+  }
+
+  onNextHint() {
+    if (this.currentHintIndex < this.hints.length - 1) {
+      this.goToHint(this.currentHintIndex + 1);
+    }
+  }
+
   onCFG() {
-    this.api.cfg(this.lang, this.code, this.currentExercise?.id).subscribe(async (r) => {
-      this.mermaidSrc = r?.mermaid ?? '';
+    if (this.cfgLoading) return;
+    this.cfgLoading = true;
+    this.api.cfg(this.lang, this.code, this.currentExercise?.id).subscribe({
+      next: (r) => {
+        this.mermaidSrc = r?.mermaid ?? '';
+        this.cfgNodes = r?.nodes ?? [];
+        this.cfgHighlightLines = null;
+        this.cfgLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.cfgLoading = false;
+        this.cdr.detectChanges();
+      }
     });
+  }
+
+  onNodeHover(range: { from: number; to: number } | null) {
+    this.cfgHighlightLines = range;
   }
 
   /**

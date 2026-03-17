@@ -1,9 +1,9 @@
 <div class="container">
   
   <header class="page-header">
-    <a routerLink="/home" class="back-link">← Volver al Dashboard</a>
-    <h1>Temario del Curso</h1>
-    <p>Explora los módulos de aprendizaje organizados por nivel.</p>
+    <a routerLink="/home" class="back-link">Volver al Dashboard</a>
+    <h1>Temario</h1>
+    <p>Módulos de aprendizaje organizados por nivel.</p>
   </header>
 
   <div class="tabs-container" *ngIf="selectedCategory$ | async as activeCat">
@@ -25,13 +25,10 @@
     <div class="topic-card" *ngFor="let topic of topics">
       
       <div class="card-top">
-        <div class="icon-box">
-          <span>{{ topic.icon }}</span>
-        </div>
         <div class="title-section">
           <div class="meta-row">
             <span class="category-badge">{{ topic.category }}</span>
-            <span class="time-badge">⏱ {{ topic.estimatedTime }}</span>
+            <span class="time-badge">{{ topic.estimatedTime }}</span>
           </div>
           <h3>{{ topic.title }}</h3>
         </div>
@@ -50,11 +47,11 @@
           <div class="progress-track">
             <div class="progress-fill" [style.width.%]="topic.progress"></div>
           </div>
-          <small>{{ topic.progress }}% Completado</small>
+          <small>{{ topic.progress }}% completado</small>
         </div>
 
         <button class="btn-view" [routerLink]="['/topics', topic.id]">
-          Entrar al Módulo →
+          Entrar
         </button>
       </div>
 
@@ -63,7 +60,7 @@
 
   <ng-template #loading>
     <div class="loading-state">
-      <p>Buscando módulos en el servidor...</p>
+      <p>Cargando módulos...</p>
     </div>
   </ng-template>
 

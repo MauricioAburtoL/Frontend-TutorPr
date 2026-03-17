@@ -42,9 +42,18 @@ export interface AssistResponse {
   next_step_question: string;
 }
 
+export interface CfgNode {
+  id: string;
+  type: string;
+  label: string;
+  lineno: number;
+  end_lineno: number;
+}
+
 export interface CfgOut {
   mermaid: string;
   source?: string; // "gemini" | "ast"
+  nodes?: CfgNode[];
 }
 
 /**

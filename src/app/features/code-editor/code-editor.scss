@@ -56,6 +56,13 @@
   line-height: 1;
 }
 
+/* ---- CFG line highlight (hover desde el diagrama) ---- */
+.cm-cfg-highlight-line {
+  background-color: rgba(108, 99, 255, 0.14) !important;
+  border-left: 3px solid #6c63ff;
+  box-sizing: border-box;
+}
+
 /* ---- Error line highlights ---- */
 .cm-error-line {
   background-color: rgba(255, 85, 85, 0.12);

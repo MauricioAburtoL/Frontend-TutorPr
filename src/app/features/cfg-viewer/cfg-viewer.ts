@@ -1,6 +1,7 @@
-import { Component, ElementRef, Input, OnChanges, OnDestroy, inject } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, Output, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID } from '@angular/core';
+import { CfgNode } from '../../core/services/api.service';
 
 @Component({
   selector: 'app-cfg-viewer',
@@ -11,6 +12,8 @@ import { PLATFORM_ID } from '@angular/core';
 })
 export class CfgViewer implements OnChanges, OnDestroy {
   @Input() mermaidSrc = '';
+  @Input() cfgNodes: CfgNode[] = [];
+  @Output() nodeHover = new EventEmitter<{ from: number; to: number } | null>();
   private host = inject(ElementRef);
   private platformId = inject(PLATFORM_ID);
 
@@ -38,10 +41,36 @@ export class CfgViewer implements OnChanges, OnDestroy {
     this.translateY = 0;
 
     const { default: mermaid } = await import('mermaid');
-    mermaid.initialize({ startOnLoad: false });
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'base',
+      themeVariables: {
+        background: '#1e1e28',
+        mainBkg: '#252530',
+        primaryColor: '#2d2b45',
+        primaryBorderColor: '#6c63ff',
+        primaryTextColor: '#e4e4eb',
+        secondaryColor: '#1e1e28',
+        secondaryBorderColor: '#5f6070',
+        secondaryTextColor: '#9394a0',
+        tertiaryColor: '#1a1a24',
+        tertiaryBorderColor: '#5f6070',
+        tertiaryTextColor: '#9394a0',
+        lineColor: '#6c63ff',
+        edgeLabelBackground: '#1e1e28',
+        fontFamily: "'Inter', system-ui, sans-serif",
+        fontSize: '14px',
+        titleColor: '#e4e4eb',
+        clusterBkg: '#1a1a24',
+        clusterBorder: '#2a2a38',
+        nodeBorder: '#6c63ff',
+        nodeTextColor: '#e4e4eb',
+      },
+    });
 
     const el: HTMLElement = this.host.nativeElement.querySelector('#diagram');
-    const { svg } = await mermaid.render('graph1', this.mermaidSrc);
+    const cleanSrc = this.sanitizeMermaid(this.mermaidSrc);
+    const { svg } = await mermaid.render('graph1', cleanSrc);
     el.innerHTML = svg;
 
     // Make SVG fill container for better zoom behavior
@@ -53,6 +82,7 @@ export class CfgViewer implements OnChanges, OnDestroy {
 
     this.applyTransform(el);
     this.attachListeners(el);
+    this.attachNodeHoverListeners(el);
   }
 
   private applyTransform(el: HTMLElement) {
@@ -98,6 +128,43 @@ export class CfgViewer implements OnChanges, OnDestroy {
     container.addEventListener('mousedown', this.boundMouseDown);
     window.addEventListener('mousemove', this.boundMouseMove);
     window.addEventListener('mouseup', this.boundMouseUp);
+  }
+
+  private sanitizeMermaid(src: string): string {
+    // Convierte labels sin comillas que contengan (), __ u otros chars problemáticos
+    // al formato seguro ["label"]. Safety net para output de Gemini.
+    return src.replace(
+      /(\w+)\s*(\[|\{)\s*([^"\]}\[{][^\]}\[{]*)\s*(\]|\})/g,
+      (_match, id, _open, label, _close) => {
+        const needsQuoting = /[\(\)]|__/.test(label);
+        if (!needsQuoting) return _match;
+        const safeLabel = label.trim().replace(/"/g, "'");
+        return `${id}["${safeLabel}"]`;
+      }
+    );
+  }
+
+  private attachNodeHoverListeners(el: HTMLElement) {
+    if (!this.cfgNodes.length) return;
+    const svgEl = el.querySelector('svg');
+    if (!svgEl) return;
+
+    const nodeMap = new Map(this.cfgNodes.map(n => [n.id, n]));
+
+    svgEl.querySelectorAll<SVGGElement>('g.node').forEach(nodeEl => {
+      const match = nodeEl.id.match(/^flowchart-(.+)-\d+$/);
+      const nodeId = match?.[1];
+      const cfgNode = nodeId ? nodeMap.get(nodeId) : undefined;
+      if (!cfgNode || cfgNode.lineno < 1) return;
+
+      nodeEl.style.cursor = 'pointer';
+      nodeEl.addEventListener('mouseenter', () => {
+        this.nodeHover.emit({ from: cfgNode.lineno, to: cfgNode.end_lineno });
+      });
+      nodeEl.addEventListener('mouseleave', () => {
+        this.nodeHover.emit(null);
+      });
+    });
   }
 
   private removeListeners() {

@@ -1,69 +1,64 @@
 <div class="dashboard-wrapper" *ngIf="userStats$ | async as userStats; else loadingState">
-  
+
   <header class="dash-header">
     <div class="welcome-text">
-      <h1>Hola, {{ userStats.username }} 👋</h1>
-      <p>Continúa tu aprendizaje donde lo dejaste.</p>
+      <h1>{{ userStats.username }}</h1>
+      <p>Continúa donde lo dejaste.</p>
     </div>
-    
+
     <div class="streak-badge">
-      <span class="fire-icon">🔥</span>
+      <span class="streak-count">{{ userStats.studyStreak }}</span>
       <div class="streak-info">
-        <span class="count">{{ userStats.studyStreak }} Días</span>
-        <span class="label">Racha seguida</span>
+        <span class="streak-unit">días</span>
+        <span class="streak-label">racha activa</span>
       </div>
     </div>
   </header>
 
   <div class="dash-grid">
-    
+
     <section class="main-column">
-      
+
       <div class="card resume-card" *ngIf="userStats.lastAccessed">
         <div class="card-content">
           <span class="tag">En curso</span>
-          <h2>Problema: {{ userStats.lastAccessed.title }}</h2>
-          <p class="topic-ref">Tema: {{ userStats.lastAccessed.topicName }}</p>
-          
+          <h2>{{ userStats.lastAccessed.title }}</h2>
+          <p class="topic-ref">{{ userStats.lastAccessed.topicName }}</p>
           <div class="progress-mini">
             <div class="bar" [style.width.%]="userStats.lastAccessed.progress"></div>
           </div>
         </div>
-        
-        <button class="btn-play" [routerLink]="['/solve', userStats.lastAccessed.exerciseId]">
-          ▶
+        <button class="btn-resume" [routerLink]="['/solve', userStats.lastAccessed.exerciseId]">
+          Continuar
         </button>
       </div>
 
       <div class="quick-actions">
-        <div class="action-card" routerLink="/topics">
-          <div class="icon-bg">📚</div>
+        <a class="action-card" routerLink="/topics">
           <div class="action-text">
             <h3>Temario</h3>
             <p>Ver todos los módulos</p>
           </div>
-          <span class="arrow">→</span>
-        </div>
-
-        <div class="action-card" routerLink="/playground">
-          <div class="icon-bg">🧪</div>
+          <span class="chevron"></span>
+        </a>
+        <a class="action-card" routerLink="/playground">
           <div class="action-text">
             <h3>Playground</h3>
             <p>Modo libre</p>
           </div>
-          <span class="arrow">→</span>
-        </div>
+          <span class="chevron"></span>
+        </a>
       </div>
     </section>
 
     <section class="side-column">
-      
+
       <div class="card stats-card">
         <div class="card-header">
-          <h3>Mis Habilidades</h3>
+          <h3>Habilidades</h3>
           <a routerLink="/profile" class="link-small">Ver perfil</a>
         </div>
-        
+
         <div class="skills-mini-list">
           <div class="skill-row" *ngFor="let skill of userStats.skills | slice:0:3">
             <span class="skill-name">{{ skill.name }}</span>
@@ -86,8 +81,7 @@
         </div>
       </div>
 
-      <div class="card tip-card">
-        <span class="tip-icon">💡</span>
+      <div class="tip-card">
         <p>{{ userStats.dailyTip }}</p>
       </div>
 
@@ -97,6 +91,6 @@
 
 <ng-template #loadingState>
   <div class="loading-state">
-    <p>Cargando tu perfil de aprendizaje...</p>
-    </div>
+    <p>Cargando...</p>
+  </div>
 </ng-template>

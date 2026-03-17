@@ -1,4 +1,41 @@
 <div class="console-area">
   <div class="console-label">Salida de la terminal:</div>
-  <pre class="console-output">{{ execOut | json }}</pre>
+
+  <!-- Idle -->
+  <div class="console-placeholder" *ngIf="isIdle">
+    Presiona Ejecutar para ver la salida aqui...
+  </div>
+
+  <!-- Running -->
+  <div class="console-running" *ngIf="isRunning">
+    <span class="spinner"></span> Ejecutando y validando...
+  </div>
+
+  <!-- Error -->
+  <ng-container *ngIf="isError">
+    <div class="verdict-banner verdict-error">
+      Error de ejecucion
+      <span class="error-type-badge" *ngIf="execOut.error_type">{{ execOut.error_type }}</span>
+    </div>
+    <pre class="console-output console-output--error">{{ execOut.stderr }}</pre>
+  </ng-container>
+
+  <!-- OK: logica incorrecta -->
+  <ng-container *ngIf="isIncorrect">
+    <pre class="console-output" *ngIf="execOut.stdout">{{ execOut.stdout }}</pre>
+    <div class="verdict-banner verdict-incorrect">
+      Logica incorrecta
+      <span class="failed-hint" *ngIf="failedCaseLabel">— {{ failedCaseLabel }}</span>
+    </div>
+  </ng-container>
+
+  <!-- OK: correcto -->
+  <ng-container *ngIf="isCorrect">
+    <pre class="console-output">{{ execOut.stdout }}</pre>
+    <div class="verdict-banner verdict-correct">
+      Correcto
+      <span class="runtime-badge" *ngIf="execOut.runtime_ms != null">{{ execOut.runtime_ms }} ms</span>
+      <span class="test-pass-label">Todos los casos de prueba pasaron</span>
+    </div>
+  </ng-container>
 </div>

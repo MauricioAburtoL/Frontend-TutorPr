@@ -2,22 +2,18 @@
   
   <header class="module-header">
     <div class="header-top">
-      <a routerLink="/topics" class="back-link">
-        <span class="icon">←</span> Volver al Temario
-      </a>
+      <a routerLink="/topics" class="back-link">Volver al Temario</a>
     </div>
 
     <div class="header-content">
-      <div class="icon-wrapper">
-        <span class="topic-icon">{{ currentTopic.icon }}</span>
-      </div>
       <div class="text-wrapper">
         <h1>{{ currentTopic.title }}</h1>
         <p>{{ currentTopic.description }}</p>
-        
+
         <div class="meta-stats" *ngIf="exercises$ | async as exercises">
-          <span class="stat"><span class="emoji">📊</span> {{ exercises.length }} Ejercicios</span>
-          <span class="stat"><span class="emoji">⏱</span> ~{{ currentTopic.totalExercises * 15 }} min</span> 
+          <span class="stat">{{ exercises.length }} ejercicios</span>
+          <span class="stat-sep">·</span>
+          <span class="stat">~{{ currentTopic.totalExercises * 15 }} min</span>
         </div>
       </div>
       
@@ -36,7 +32,7 @@
     <ng-container *ngIf="exercises$ | async as exercises; else loadingExercises">
       
       <div class="empty-state" *ngIf="exercises.length === 0">
-        <p>📭 No hay ejercicios cargados para este tema todavía.</p>
+        <p>No hay ejercicios cargados para este tema todavía.</p>
       </div>
 
       <div class="timeline-item" *ngFor="let ex of exercises; let i = index">
@@ -83,12 +79,12 @@
 
 <ng-template #loadingTopic>
   <div class="loading-state">
-    <p>Cargando información del módulo...</p>
+    <p>Cargando módulo...</p>
   </div>
 </ng-template>
 
 <ng-template #loadingExercises>
   <div class="loading-state">
-    <p>Buscando ejercicios disponibles...</p>
+    <p>Cargando ejercicios...</p>
   </div>
 </ng-template>

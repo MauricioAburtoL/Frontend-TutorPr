@@ -6,10 +6,12 @@
   line-height: 1.5;
 
   strong {
-    font-size: 0.78rem;
+    font-size: 0.7rem;
     color: var(--amber);
     display: block;
     margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
   }
 
   p {

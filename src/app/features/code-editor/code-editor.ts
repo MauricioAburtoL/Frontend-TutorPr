@@ -37,6 +37,36 @@ import type { Lang } from '../../core/services/api.service';
 
 const setErrorsEffect = StateEffect.define<DetectedError[]>();
 
+// --- CodeMirror extensions for CFG line highlight ---
+
+const setCfgHighlightEffect = StateEffect.define<{ from: number; to: number } | null>();
+
+const cfgHighlightDecoration = Decoration.line({ class: 'cm-cfg-highlight-line' });
+
+const cfgHighlightField = StateField.define<DecorationSet>({
+  create() {
+    return Decoration.none;
+  },
+  update(decorations, tr) {
+    for (const effect of tr.effects) {
+      if (effect.is(setCfgHighlightEffect)) {
+        if (!effect.value) return Decoration.none;
+        const { from, to } = effect.value;
+        const doc = tr.state.doc;
+        const decos: any[] = [];
+        for (let line = from; line <= to; line++) {
+          if (line >= 1 && line <= doc.lines) {
+            decos.push(cfgHighlightDecoration.range(doc.line(line).from));
+          }
+        }
+        return Decoration.set(decos, true);
+      }
+    }
+    return decorations;
+  },
+  provide: (f) => EditorView.decorations.from(f),
+});
+
 // Line decoration (background highlight)
 const errorLineDecoration = Decoration.line({ class: 'cm-error-line' });
 const warningLineDecoration = Decoration.line({ class: 'cm-warning-line' });
@@ -125,6 +155,7 @@ export class CodeEditor implements OnChanges, OnDestroy {
   @Input() code = '';
   @Input() lang: Lang = 'python';
   @Input() detectedErrors: DetectedError[] = [];
+  @Input() highlightLines: { from: number; to: number } | null = null;
   @Output() codeChange = new EventEmitter<string>();
 
   @ViewChild('editorHost', { static: true })
@@ -156,6 +187,13 @@ export class CodeEditor implements OnChanges, OnDestroy {
       this.currentErrors = this.detectedErrors || [];
       this.editorView.dispatch({
         effects: setErrorsEffect.of(this.currentErrors),
+      });
+    }
+
+    // Update CFG line highlight
+    if (changes['highlightLines'] && this.editorView) {
+      this.editorView.dispatch({
+        effects: setCfgHighlightEffect.of(this.highlightLines ?? null),
       });
     }
   }
@@ -213,6 +251,7 @@ export class CodeEditor implements OnChanges, OnDestroy {
         errorDecorationField,
         errorGutterField,
         errorGutter,
+        cfgHighlightField,
         this.buildErrorTooltip(),
         updateListener,
         EditorView.theme({
