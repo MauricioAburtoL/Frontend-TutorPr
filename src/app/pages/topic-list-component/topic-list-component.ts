@@ -21,7 +21,7 @@ export class TopicListComponent implements OnInit {
   filteredTopics$!: Observable<Topic[]>;
 
   // Categorías estáticas para la vista
-  categories: string[] = ['Todos', 'Fundamentos', 'Lógica', 'Estructuras'];
+  categories: string[] = ['Todos', 'Fundamentos', 'Lógica', 'Estructuras', 'POO'];
 
   constructor(private contentService: ContentService) {}
 

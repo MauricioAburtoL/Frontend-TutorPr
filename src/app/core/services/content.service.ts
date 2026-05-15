@@ -11,6 +11,8 @@ export interface Exercise {
   title: string;
   description: string;
   difficulty: 'Fácil' | 'Medio' | 'Difícil';
+  baseCode?: string;
+  order?: number;
   completed: boolean;
 }
 

@@ -92,7 +92,7 @@ export class Playground implements OnInit {
       next: (ex) => {
         if (ex) {
           this.currentExercise = { ...ex };
-          this.code = (ex as any).baseCode || `# Solución para: ${this.currentExercise?.title}\n`;
+          this.code = ex.baseCode || `# Solución para: ${this.currentExercise?.title}\n`;
           this.cdr.detectChanges();
         }
       },
